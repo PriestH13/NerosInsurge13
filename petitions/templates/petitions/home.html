@@ -1,11 +1,160 @@
+
+{% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="it">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>test</title>
-</head>
+    <title>NerosInsurge - Petizioni per il cambiamento</title>
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
+    <link rel="icon" href="{% static 'images/logo.png' %}" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/home.css' %}"></head>
 <body>
-    Test
+    <!-- Header/Navbar -->
+    <header class="header">
+        <div class="container">
+            <img src="{% static 'images/logo.png' %}" alt="NerosTime13 Logo" class="logo-img">
+            <a href="index.html" class="logo">NerosInsurge13</a>
+            
+            <nav class="nav">
+                <a href="login.html" class="nav-link"><i class="fas fa-sign-in-alt"></i> Accedi</a>
+                <a href="register.html" class="nav-link"><i class="fas fa-user-plus"></i> Registrati</a>
+                <a href="create.html" class="nav-link button"><i class="fas fa-plus"></i> Crea Petizione</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h1>Per ogni ingiustizia, una petizione. Per ogni firma, un risveglio.</h1>
+            <p>Unisciti a migliaia di persone che stanno cambiando le cose attraverso petizioni mirate</p>
+            <a href="create.html" class="button primary">Crea una petizione</a>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Search/Filters -->
+            <div class="search-filters">
+                <div class="search-bar">
+                    <input type="text" placeholder="Cerca petizioni...">
+                    <button type="submit"><i class="fas fa-search"></i></button>
+                </div>
+                <div class="filters">
+                    <select>
+                        <option value="">Tutte le categorie</option>
+                        <option value="ambiente">Ambiente</option>
+                        <option value="diritti">Diritti</option>
+                        <option value="politica">Politica</option>
+                    </select>
+                    <select>
+                        <option value="">Ordina per</option>
+                        <option value="recenti">Più recenti</option>
+                        <option value="popolari">Più popolari</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Petitions Grid -->
+            <div class="petitions-grid">
+                <!-- Petition Card 1 -->
+                <div class="petition-card">
+                    <div class="petition-image">
+                        <img src="images/sample-petition.jpg" alt="Salviamo il parco cittadino">
+                    </div>
+                    <div class="petition-content">
+                        <span class="category">Ambiente</span>
+                        <h3><a href="petition.html">Salviamo il parco cittadino dalla speculazione edilizia</a></h3>
+                        <p class="description">Chiediamo al comune di bloccare il progetto di costruzione nell'area verde del centro...</p>
+                        
+                        <div class="progress-container">
+                            <div class="progress-bar" style="width: 65%"></div>
+                            <span>6,542 firme su 10,000</span>
+                        </div>
+                        
+                        <div class="petition-meta">
+                            <span><i class="fas fa-user"></i> Mario Rossi</span>
+                            <span><i class="fas fa-calendar"></i> 15 giorni fa</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Petition Card 2 -->
+                <div class="petition-card">
+                    <div class="petition-image">
+                        <img src="images/sample-petition2.jpg" alt="Riforma educativa">
+                    </div>
+                    <div class="petition-content">
+                        <span class="category">Istruzione</span>
+                        <h3><a href="petition.html">Riforma del sistema educativo nazionale</a></h3>
+                        <p class="description">Petizione per chiedere al Ministero dell'Istruzione di rivedere i programmi scolastici...</p>
+                        
+                        <div class="progress-container">
+                            <div class="progress-bar" style="width: 82%"></div>
+                            <span>24,801 firme su 30,000</span>
+                        </div>
+                        
+                        <div class="petition-meta">
+                            <span><i class="fas fa-user"></i> Laura Bianchi</span>
+                            <span><i class="fas fa-calendar"></i> 1 mese fa</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- More cards would go here -->
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination">
+                <a href="#" class="active">1</a>
+                <a href="#">2</a>
+                <a href="#">3</a>
+                <a href="#"><i class="fas fa-chevron-right"></i></a>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>NerosInsurge</h4>
+                    <p>Piattaforma per il cambiamento sociale attraverso petizioni online.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Link utili</h4>
+                    <ul>
+                        <li><a href="about.html">Chi siamo</a></li>
+                        <li><a href="terms.html">Termini e condizioni</a></li>
+                        <li><a href="privacy.html">Privacy</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Contatti</h4>
+                    <ul>
+                        <li><i class="fas fa-envelope"></i> info@nerosinsurge.it</li>
+                        <li><i class="fas fa-phone"></i> +39 123 456789</li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Seguici</h4>
+                    <div class="social-icons">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2023 NerosInsurge. Tutti i diritti riservati.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script scr="{% static 'javascript/home.js' %}"></script>
 </body>
 </html>
