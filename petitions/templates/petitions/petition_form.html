@@ -1,0 +1,25 @@
+{% extends 'petitions/base_petition.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>{% if form.instance.pk %}Modifica Petizione{% else %}Crea Petizione{% endif %}</h2>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        <div class="mb-3">
+            {{ form.title.label_tag }}
+            {{ form.title }}
+        </div>
+        <div class="mb-3">
+            {{ form.description.label_tag }}
+            {{ form.description }}
+        </div>
+        <div class="mb-3">
+            {{ form.category.label_tag }}
+            {{ form.category }}
+        </div>
+        <button type="submit" class="btn btn-primary">Salva</button>
+    </form>
+</div>
+{% endblock %}

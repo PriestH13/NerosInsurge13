@@ -1,0 +1,28 @@
+{% extends 'petitions/base_petition.html' %}
+
+{% block content %}
+  <div class="container mt-5">
+    <h2>Update Petition</h2>
+    <form method="post" class="mt-4">
+      {% csrf_token %}
+      <div class="mb-3">
+        <label for="{{ form.title.id_for_label }}" class="form-label">Title</label>
+        {{ form.title }}
+      </div>
+      <div class="mb-3">
+        <label for="{{ form.description.id_for_label }}" class="form-label">Description</label>
+        {{ form.description }}
+      </div>
+      <div class="mb-3">
+        <label for="{{ form.category.id_for_label }}" class="form-label">Category</label>
+        {{ form.category }}
+      </div>
+      <div class="mb-3">
+        <label for="{{ form.tags.id_for_label }}" class="form-label">Tags</label>
+        {{ form.tags }}
+      </div>
+      <button type="submit" class="btn btn-primary">Update Petition</button>
+      <a href="{% url 'petition_list' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+  </div>
+{% endblock %}

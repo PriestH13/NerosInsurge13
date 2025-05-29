@@ -1,0 +1,35 @@
+{% extends 'petitions/base_petition.html' %}
+{% load static %}
+
+{% block content %}
+<main class="main-content">
+    <div class="container">
+        <div class="petition-card">
+            <div class="petition-image">
+                {% if petition.attachments.first %}
+                    <img src="{{ petition.attachments.first.file.url }}" alt="{{ petition.title }}">
+                {% else %}
+                    <img src="{% static 'images/sample-petition.jpg' %}" alt="{{ petition.title }}">
+                {% endif %}
+            </div>
+            <div class="petition-content">
+                <span class="category">{{ petition.category.name|default:"Uncategorized" }}</span>
+                <h3>{{ petition.title }}</h3>
+                <p class="description">{{ petition.description }}</p>
+                <div class="progress-container">
+                    <div class="progress-bar" style="width: {{ petition.signatures.count|default:0|floatformat:0 }}%"></div>
+                    <span>{{ petition.signatures.count|default:0 }} firme su 10,000</span>
+                </div>
+                <div class="petition-meta">
+                    <span><i class="fas fa-user"></i> {{ petition.created_by.username }}</span>
+                    <span><i class="fas fa-calendar"></i> {{ petition.created_at|date:"d M Y" }}</span>
+                </div>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'petitions:petition_edit' petition.pk %}" class="button">Edit Petition</a>
+                    <a href="{% url 'petitions:petition_delete' petition.pk %}" class="button">Delete Petition</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}

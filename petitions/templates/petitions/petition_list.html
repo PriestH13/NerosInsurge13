@@ -1,0 +1,43 @@
+{% extends 'petitions/base_petition.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Tutte le Petizioni</h2>
+    <form method="get" class="mb-3">
+        <input type="text" name="q" placeholder="Cerca..." value="{{ request.GET.q }}">
+        <select name="category">
+            <option value="">Tutte le categorie</option>
+            {% for category in categories %}
+                <option value="{{ category.name }}" {% if category.name == request.GET.category %}selected{% endif %}>{{ category.name }}</option>
+            {% endfor %}
+        </select>
+        <select name="order">
+            <option value="recenti">Più recenti</option>
+            <option value="popolari" {% if request.GET.order == "popolari" %}selected{% endif %}>Più popolari</option>
+        </select>
+        <button type="submit">Filtra</button>
+    </form>
+
+    <div class="row">
+        {% for petition in petitions %}
+            <div class="col-md-4">
+                <h4><a href="{% url 'petitions:petition_detail' petition.pk %}">{{ petition.title }}</a></h4>
+                <p>{{ petition.description|truncatewords:20 }}</p>
+            </div>
+        {% empty %}
+            <p>Nessuna petizione trovata.</p>
+        {% endfor %}
+    </div>
+
+    <div class="pagination">
+        {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}">«</a>
+        {% endif %}
+        <span>Pagina {{ page_obj.number }} di {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">»</a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

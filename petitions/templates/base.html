@@ -1,0 +1,40 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NerosInsurge - Petizioni per il cambiamento</title>
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
+    <link rel="icon" href="{% static 'images/logo.png' %}" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header/Navbar -->
+
+   {% include "partials/nav_petition.html" %}
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h1>Per ogni ingiustizia, una petizione. Per ogni firma, un risveglio.</h1>
+            <p>Unisciti a migliaia di persone che stanno cambiando le cose attraverso petizioni mirate</p>
+            <a href="{% url 'petitions:petition_create' %}" class="button primary">Crea una petizione</a>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            {% block content %}
+            <!-- Il contenuto specifico di ogni pagina verrà inserito qui -->
+            {% endblock %}
+        </div>
+    </main>
+
+    <!-- Footer -->
+
+    {% include 'partials/footer_petition.html' %}
+
+    <script src="{% static 'javascript/home.js' %}"></script>
+</body>
+</html>

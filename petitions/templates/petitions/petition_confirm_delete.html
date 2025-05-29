@@ -1,0 +1,14 @@
+{% extends 'petitions/base_petition.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Elimina Petizione</h2>
+    <p>Sei sicuro di voler eliminare "{{ petition.title }}"?</p>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Conferma</button>
+        <a href="{% url 'petitions:petition_detail' petition.pk %}" class="btn btn-secondary">Annulla</a>
+    </form>
+</div>
+{% endblock %}
