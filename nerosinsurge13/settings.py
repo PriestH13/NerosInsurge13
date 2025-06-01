@@ -25,6 +25,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'petitions',
     'auth_users',
+    "widget_tweaks",
 ]
 
 MIDDLEWARE = [
@@ -110,3 +111,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'auth_users.User'
 
+LOGIN_URL = 'auth:login'
+LOGIN_REDIRECT_URL = 'petitions:home'
+LOGOUT_REDIRECT_URL = 'auth:login'
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+DEFAULT_FROM_EMAIL = 'noreply@neros13.com'

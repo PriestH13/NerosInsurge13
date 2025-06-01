@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Modifica Profilo{% endblock %}
+{% block page_content %}{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/profile.css' %}">
+<script src="{% static 'javascripts/profile.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+<section class="profile-edit-container" aria-labelledby="profile-title">
+  <h2 class="title" id="profile-title">Modifica Profilo</h2>
+
+  <form method="post" enctype="multipart/form-data" class="profile-form" aria-describedby="form-instructions">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+
+    <!-- Campo Foto Profilo -->
+    <div class="form-group profile-picture-group">
+      <label for="id_profile_picture" class="visually-hidden">Foto Profilo</label>
+      {{ form.profile_picture }}
+      <p id="profile-picture-help" class="form-help">Clicca sul placeholder per caricare un'immagine (JPG, PNG, max 5MB).</p>
+      {% if form.profile_picture.errors %}
+        <div class="form-error" role="alert">{{ form.profile_picture.errors }}</div>
+      {% endif %}
+
+      <div class="image-preview" role="region" aria-live="polite">
+        <img id="preview-img" class="hidden" alt="Anteprima Foto Profilo" aria-hidden="true">
+        <div id="image-placeholder" class="image-placeholder" role="button" tabindex="0" aria-label="Carica nuova immagine">
+          Nessuna immagine selezionata
+        </div>
+      </div>
+    </div>
+
+    <!-- Altri campi del form -->
+    {% for field in form %}
+      {% if field.name != 'profile_picture' %}
+        <div class="form-group">
+          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field }}
+          {% if field.errors %}
+            <div class="form-error" role="alert">{{ field.errors }}</div>
+          {% endif %}
+        </div>
+      {% endif %}
+    {% endfor %}
+
+    <button type="submit" class="btn-save">Salva</button>
+  </form>
+</section>
+{% endblock %}

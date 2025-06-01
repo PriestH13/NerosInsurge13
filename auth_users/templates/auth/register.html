@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Registrazione{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/register.css' %}">
+<script src="{% static 'js/register.js' %}" defer></script>
+{% endblock %}
+
+{% block content %}
+<div class="register-container" role="main" aria-labelledby="register-title">
+  <h2 id="register-title">Registrazione</h2>
+  <form method="post" novalidate id="register-form" aria-describedby="form-instructions">
+    {% csrf_token %}
+    
+    <div class="form-group">
+      <label for="id_username">Username</label>
+      {{ form.username }}
+      {% if form.username.errors %}
+        <div class="form-error" role="alert">{{ form.username.errors.0 }}</div>
+      {% endif %}
+    </div>
+
+    <div class="form-group">
+      <label for="id_email">Email</label>
+      {{ form.email }}
+      {% if form.email.errors %}
+        <div class="form-error" role="alert">{{ form.email.errors.0 }}</div>
+      {% endif %}
+    </div>
+
+    <div class="form-group password-input">
+      <label for="id_password1">Password</label>
+      <div class="password-wrapper">
+        {{ form.password1 }}
+        <button type="button" class="btn-toggle-password" aria-label="Mostra password" title="Mostra password">&#128065;</button>
+      </div>
+      <div id="password-feedback" class="form-feedback" aria-live="polite"></div>
+    </div>
+
+    <div class="form-group password-input">
+      <label for="id_password2">Conferma Password</label>
+      <div class="password-wrapper">
+        {{ form.password2 }}
+        <button type="button" class="btn-toggle-password" aria-label="Mostra password" title="Mostra password">&#128065;</button>
+      </div>
+      <div id="password2-feedback" class="form-feedback" aria-live="polite"></div>
+      {% if form.password2.errors %}
+        <div class="form-error" role="alert">{{ form.password2.errors.0 }}</div>
+      {% endif %}
+    </div>
+    
+    <button type="submit" class="btn-submit">Registrati</button>
+  </form>
+</div>
+{% endblock %}

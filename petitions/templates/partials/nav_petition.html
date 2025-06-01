@@ -1,13 +1,94 @@
-{%load static%}
+{% load static %}
 
-    <header class="header">
-        <div class="container">
-            <img src="{% static 'images/logo.png' %}" alt="NerosInsurge Logo" class="logo-img">
-            <a href="{% url 'petitions:home' %}" class="logo">NerosInsurge13</a>
-            <nav class="nav">
-                <a href="" class="nav-link"><i class="fas fa-sign-in-alt"></i> Accedi</a>
-                <a href="" class="nav-link"><i class="fas fa-user-plus"></i> Registrati</a>
-                <a href="{% url 'petitions:petition_create' %}" class="nav-link button"><i class="fas fa-plus"></i> Crea Petizione</a>
-            </nav>
-        </div>
-    </header>
+<header class="header">
+    <div class="container">
+        <img src="{% static 'images/logo.png' %}" alt="NerosInsurge Logo" class="logo-img">
+        <a href="{% url 'petitions:home' %}" class="logo">NerosInsurge13</a>
+        <nav class="nav">
+            <a href="{% url 'petitions:petition_create' %}" class="nav-link button">
+                <i class="fas fa-plus"></i> Crea Petizione
+            </a>
+
+            {% if user.is_authenticated %}
+                <div class="profile-dropdown">
+                    <button class="profile-btn">
+                        <img src="{% if user.profile_picture %}{{ user.profile_picture.url }}{% else %}{% static 'images/default_profile.png' %}{% endif %}" 
+                             alt="Profilo" class="profile-icon" style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover;">
+                    </button>
+                    <div class="dropdown-content">
+                        <a href="{% url 'auth:profile' %}">Profilo</a>
+                        <a href="{% url 'auth:profile_edit' %}">Modifica Profilo</a>
+                        <form method="post" action="{% url 'auth:logout' %}" style="margin:0;">
+                            {% csrf_token %}
+                            <button type="submit" class="logout-button">Esci</button>
+                        </form>
+                    </div>
+                </div>
+            {% else %}
+                <a href="{% url 'auth:login' %}" class="nav-link">
+                    <i class="fas fa-sign-in-alt"></i> Accedi
+                </a>
+                <a href="{% url 'auth:register' %}" class="nav-link">
+                    <i class="fas fa-user-plus"></i> Registrati
+                </a>
+            {% endif %}
+        </nav>
+    </div>
+</header>
+
+    </div>
+</header>
+
+<style>
+.profile-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.profile-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    right: 0;
+    background-color: white;
+    min-width: 140px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    border-radius: 4px;
+    z-index: 1000;
+    font-size: 0.9rem;
+}
+
+.dropdown-content a,
+.dropdown-content .logout-button {
+    color: #333;
+    padding: 10px 15px;
+    text-decoration: none;
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+.dropdown-content a:hover,
+.dropdown-content .logout-button:hover {
+    background-color: #f0f0f0;
+}
+
+.profile-dropdown:hover .dropdown-content,
+.profile-dropdown:focus-within .dropdown-content {
+    display: block;
+}
+
+.logout-button {
+    font-size: 1rem;
+}
+</style>
