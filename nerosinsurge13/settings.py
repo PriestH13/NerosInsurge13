@@ -115,3 +115,5 @@ LOGIN_URL = 'auth:login'
 LOGIN_REDIRECT_URL = 'petitions:home'
 LOGOUT_REDIRECT_URL = 'auth:login'
 
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+DEFAULT_FROM_EMAIL = 'noreply@neros13.com'

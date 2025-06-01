@@ -915,3 +915,174 @@ main.main-content {
     display: block;
 }
 
+/* ----------------------------------------------- */
+/* petitions.css */
+.petitions-slider {
+    padding: 40px 0;
+    background-color: #f8f9fa;
+}
+
+.slider-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.slider-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.slider-header h2 {
+    font-size: 2rem;
+    color: #2c3e50;
+    margin-bottom: 15px;
+}
+
+.slider-header p {
+    color: #7f8c8d;
+    font-size: 1.1rem;
+}
+
+.petitions-carousel {
+    position: relative;
+}
+
+.petitions-wrapper {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    gap: 20px;
+    padding: 20px 0;
+}
+
+.petitions-wrapper::-webkit-scrollbar {
+    display: none;
+}
+
+.petition-card {
+    flex: 0 0 300px;
+    scroll-snap-align: start;
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.petition-card:hover {
+    transform: translateY(-5px);
+}
+
+.petition-image {
+    height: 180px;
+    overflow: hidden;
+}
+
+.petition-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.petition-content {
+    padding: 20px;
+}
+
+.petition-content h3 {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+    color: #2c3e50;
+}
+
+.petition-content p {
+    color: #7f8c8d;
+    font-size: 0.9rem;
+    margin-bottom: 15px;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.petition-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 15px;
+}
+
+.progress-container {
+    width: 100%;
+    background-color: #ecf0f1;
+    border-radius: 5px;
+    margin: 10px 0;
+}
+
+.progress-bar {
+    height: 8px;
+    border-radius: 5px;
+    background-color: #3498db;
+}
+
+.signatures-count {
+    font-size: 0.8rem;
+    color: #7f8c8d;
+}
+
+.btn-sign {
+    display: inline-block;
+    padding: 8px 15px;
+    background-color: #e74c3c;
+    color: white;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+.btn-sign:hover {
+    background-color: #c0392b;
+}
+
+.slider-nav {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+    gap: 10px;
+}
+
+.slider-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #3498db;
+    color: white;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.slider-btn:hover {
+    background: #2980b9;
+}
+
+.slider-btn:disabled {
+    background: #bdc3c7;
+    cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+    .petition-card {
+        flex: 0 0 250px;
+    }
+    
+    .slider-header h2 {
+        font-size: 1.5rem;
+    }
+}

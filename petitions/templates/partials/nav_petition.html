@@ -5,6 +5,10 @@
         <img src="{% static 'images/logo.png' %}" alt="NerosInsurge Logo" class="logo-img">
         <a href="{% url 'petitions:home' %}" class="logo">NerosInsurge13</a>
         <nav class="nav">
+            <a href="{% url 'petitions:petition_create' %}" class="nav-link button">
+                <i class="fas fa-plus"></i> Crea Petizione
+            </a>
+
             {% if user.is_authenticated %}
                 <div class="profile-dropdown">
                     <button class="profile-btn">
@@ -20,13 +24,18 @@
                         </form>
                     </div>
                 </div>
-                <a href="{% url 'petitions:petition_create' %}" class="nav-link button"><i class="fas fa-plus"></i> Crea Petizione</a>
             {% else %}
-                <a href="{% url 'auth:login' %}" class="nav-link"><i class="fas fa-sign-in-alt"></i> Accedi</a>
-                <a href="{% url 'auth:register' %}" class="nav-link"><i class="fas fa-user-plus"></i> Registrati</a>
-                <a href="{% url 'petitions:petition_create' %}" class="nav-link button"><i class="fas fa-plus"></i> Crea Petizione</a>
+                <a href="{% url 'auth:login' %}" class="nav-link">
+                    <i class="fas fa-sign-in-alt"></i> Accedi
+                </a>
+                <a href="{% url 'auth:register' %}" class="nav-link">
+                    <i class="fas fa-user-plus"></i> Registrati
+                </a>
             {% endif %}
         </nav>
+    </div>
+</header>
+
     </div>
 </header>
 
