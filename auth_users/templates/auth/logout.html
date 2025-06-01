@@ -1,8 +1,11 @@
 {% extends "base.html" %}
 {% block title %}Logout{% endblock %}
 
-{% block page_content %}{% endblock %} 
+{% block page_content %}{% endblock %}
+
 {% block content %}
-<p>Sei stato disconnesso.</p>
-<a href="{% url 'auth:login' %}">Effettua di nuovo il login</a>
+<div class="logout-container">
+    <p>Sei stato disconnesso.</p>
+    <a href="{% url 'auth:login' %}" class="btn-login-again">Effettua di nuovo il login</a>
+</div>
 {% endblock %}

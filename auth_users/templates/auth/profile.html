@@ -1,14 +1,42 @@
 {% extends "base.html" %}
+{% load static %}
 
-{% block page_content %}{% endblock %} 
 {% block title %}Profilo{% endblock %}
+{% block page_content %}{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/profile.css' %}">
+{% endblock %}
+
 {% block content %}
-<h2>Profilo di {{ user_profile.username }}</h2>
-{% if user_profile.profile_picture %}
-    <img src="{{ user_profile.profile_picture.url }}" alt="Foto Profilo" style="width:150px;">
-{% endif %}
-<p>Email: {{ user_profile.email }}</p>
-<p>Bio: {{ user_profile.bio }}</p>
-<p>Data di nascita: {{ user_profile.date_of_birth }}</p>
-<a href="{% url 'auth:profile_edit' %}">Modifica Profilo</a>
+<main class="profile-container">
+
+
+    <section class="profile-picture-section">
+        {% if user_profile.profile_picture %}
+            <img src="{{ user_profile.profile_picture.url }}" alt="Foto profilo di {{ user_profile.username }}" class="profile-picture" />
+        {% else %}
+            <img src="{% static 'images/default-profile.png' %}" alt="Foto profilo di default" class="profile-picture" />
+        {% endif %}
+    </section>
+
+    <section class="profile-info">
+        <dl>
+            <dt>Email:</dt>
+            <dd>{{ user_profile.email }}</dd>
+
+            <dt>Bio:</dt>
+            <dd>{{ user_profile.bio|default:"Non disponibile" }}</dd>
+
+            <dt>Data di nascita:</dt>
+            <dd>{{ user_profile.date_of_birth|date:"d/m/Y" }}</dd>
+        </dl>
+    </section>
+
+    <footer class="profile-footer">
+        <a href="{% url 'auth:profile_edit' %}" class="btn-edit-profile" aria-label="Modifica il profilo di {{ user_profile.username }}">
+            Modifica Profilo
+        </a>
+    </footer>
+</main>
 {% endblock %}

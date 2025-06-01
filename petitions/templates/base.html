@@ -4,20 +4,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NerosInsurge - Petizioni per il cambiamento</title>
+    <title>{% block title %}NerosInsurge - Petizioni per il cambiamento{% endblock %}</title>
+    
     <link rel="stylesheet" href="{% static 'css/home.css' %}">
     <link rel="icon" href="{% static 'images/logo.png' %}" type="image/x-icon">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    {% block extra_head %}{% endblock %}
 </head>
 <body>
     <!-- Header/Navbar -->
+    {% include "partials/nav_petition.html" %}
 
-   {% include "partials/nav_petition.html" %}
     <!-- Hero Section -->
-
     {% block page_content %}
         {% include "partials/banner_petiton.html" %}
     {% endblock %}
+
     <!-- Main Content -->
     <main class="main-content">
         <div class="container">
@@ -28,7 +31,6 @@
     </main>
 
     <!-- Footer -->
-
     {% include 'partials/footer_petition.html' %}
 
     <script src="{% static 'javascript/home.js' %}"></script>

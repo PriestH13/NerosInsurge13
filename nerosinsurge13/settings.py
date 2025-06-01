@@ -25,6 +25,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'petitions',
     'auth_users',
+    "widget_tweaks",
 ]
 
 MIDDLEWARE = [

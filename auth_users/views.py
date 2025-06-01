@@ -26,3 +26,7 @@ class ProfileUpdateView(LoginRequiredMixin, UpdateView):
 
     def get_object(self):
         return self.request.user
+
+    def form_invalid(self, form):
+        print(form.errors)
+        return super().form_invalid(form)
