@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block page_content %}{% endblock %} 
+{% block title %}Profilo{% endblock %}
+{% block content %}
+<h2>Profilo di {{ user_profile.username }}</h2>
+{% if user_profile.profile_picture %}
+    <img src="{{ user_profile.profile_picture.url }}" alt="Foto Profilo" style="width:150px;">
+{% endif %}
+<p>Email: {{ user_profile.email }}</p>
+<p>Bio: {{ user_profile.bio }}</p>
+<p>Data di nascita: {{ user_profile.date_of_birth }}</p>
+<a href="{% url 'auth:profile_edit' %}">Modifica Profilo</a>
+{% endblock %}

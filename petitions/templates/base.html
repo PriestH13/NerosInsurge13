@@ -14,14 +14,10 @@
 
    {% include "partials/nav_petition.html" %}
     <!-- Hero Section -->
-    <section class="hero">
-        <div class="container">
-            <h1>Per ogni ingiustizia, una petizione. Per ogni firma, un risveglio.</h1>
-            <p>Unisciti a migliaia di persone che stanno cambiando le cose attraverso petizioni mirate</p>
-            <a href="{% url 'petitions:petition_create' %}" class="button primary">Crea una petizione</a>
-        </div>
-    </section>
 
+    {% block page_content %}
+        {% include "partials/banner_petiton.html" %}
+    {% endblock %}
     <!-- Main Content -->
     <main class="main-content">
         <div class="container">

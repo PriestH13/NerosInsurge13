@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block page_content %}{% endblock %} 
+{% block title %}Modifica Profilo{% endblock %}
+{% block content %}
+<h2>Modifica Profilo</h2>
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Salva</button>
+</form>
+{% endblock %}
