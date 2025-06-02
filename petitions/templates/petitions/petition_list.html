@@ -1,7 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block page_content %}{% endblock %} 
 {% block content %}
 <div class="container mt-5">
     <h2 class="mb-4">Tutte le Petizioni</h2>
@@ -41,6 +40,10 @@
                             <a href="{% url 'petitions:petition_detail' petition.pk %}">{{ petition.title }}</a>
                         </h5>
                         <p class="card-text">{{ petition.description|truncatewords:25 }}</p>
+
+                        {% if user.is_authenticated and petition.created_by == user %}
+                            <a href="{% url 'petitions:petition_edit' petition.pk %}" class="btn btn-sm btn-warning mt-2">Modifica</a>
+                        {% endif %}
                     </div>
                     <div class="card-footer text-muted small">
                         Categoria: {{ petition.category }}<br>
