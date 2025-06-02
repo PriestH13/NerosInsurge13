@@ -2,28 +2,66 @@
 
 {% block page_content %}{% endblock %} 
 {% block content %}
-  <div class="container mt-5">
-    <h2>Update Petition</h2>
-    <form method="post" class="mt-4">
-      {% csrf_token %}
-      <div class="mb-3">
-        <label for="{{ form.title.id_for_label }}" class="form-label">Title</label>
-        {{ form.title }}
+<div class="container mt-5">
+  <h2>Update Petition</h2>
+  <form method="post" enctype="multipart/form-data" class="mt-4">
+    {% csrf_token %}
+    
+    <div class="mb-3">
+      <label for="{{ form.title.id_for_label }}" class="form-label">Title</label>
+      {{ form.title }}
+    </div>
+
+    <div class="mb-3">
+      <label for="{{ form.description.id_for_label }}" class="form-label">Description</label>
+      {{ form.description }}
+    </div>
+
+    <div class="mb-3">
+      <label for="{{ form.category.id_for_label }}" class="form-label">Category</label>
+      {{ form.category }}
+    </div>
+
+    <div class="mb-3">
+      <label for="{{ form.tags.id_for_label }}" class="form-label">Tags</label>
+      {{ form.tags }}
+    </div>
+
+    <div class="mb-3">
+      <label for="{{ form.image.id_for_label }}" class="form-label">Image</label>
+      {{ form.image }}
+      <div class="mt-2">
+        {% if form.instance.image %}
+          <img id="image-preview" src="{{ form.instance.image.url }}" alt="Current Image" style="max-height: 200px;">
+        {% else %}
+          <img id="image-preview" src="#" alt="Preview" style="display:none; max-height: 200px;">
+        {% endif %}
       </div>
-      <div class="mb-3">
-        <label for="{{ form.description.id_for_label }}" class="form-label">Description</label>
-        {{ form.description }}
-      </div>
-      <div class="mb-3">
-        <label for="{{ form.category.id_for_label }}" class="form-label">Category</label>
-        {{ form.category }}
-      </div>
-      <div class="mb-3">
-        <label for="{{ form.tags.id_for_label }}" class="form-label">Tags</label>
-        {{ form.tags }}
-      </div>
-      <button type="submit" class="btn btn-primary">Update Petition</button>
-      <a href="{% url 'petition_list' %}" class="btn btn-secondary">Cancel</a>
-    </form>
-  </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Update Petition</button>
+    <a href="{% url 'petition_list' %}" class="btn btn-secondary">Cancel</a>
+  </form>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const input = document.querySelector('input[type="file"][name="image"]');
+    const preview = document.getElementById('image-preview');
+
+    if (input) {
+      input.addEventListener('change', function (event) {
+        const file = event.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            preview.src = e.target.result;
+            preview.style.display = 'block';
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+    }
+  });
+</script>
 {% endblock %}

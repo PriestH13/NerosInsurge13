@@ -4,40 +4,64 @@
 {% block page_content %}{% endblock %} 
 {% block content %}
 <div class="container mt-5">
-    <h2>Tutte le Petizioni</h2>
-    <form method="get" class="mb-3">
-        <input type="text" name="q" placeholder="Cerca..." value="{{ request.GET.q }}">
-        <select name="category">
-            <option value="">Tutte le categorie</option>
-            {% for category in categories %}
-                <option value="{{ category.name }}" {% if category.name == request.GET.category %}selected{% endif %}>{{ category.name }}</option>
-            {% endfor %}
-        </select>
-        <select name="order">
-            <option value="recenti">Più recenti</option>
-            <option value="popolari" {% if request.GET.order == "popolari" %}selected{% endif %}>Più popolari</option>
-        </select>
-        <button type="submit">Filtra</button>
+    <h2 class="mb-4">Tutte le Petizioni</h2>
+
+    <form method="get" class="row g-2 mb-4 align-items-end">
+        <div class="col-md-4">
+            <input type="text" name="q" class="form-control" placeholder="Cerca..." value="{{ request.GET.q }}">
+        </div>
+        <div class="col-md-3">
+            <select name="category" class="form-select">
+                <option value="">Tutte le categorie</option>
+                {% for category in categories %}
+                    <option value="{{ category.name }}" {% if category.name == request.GET.category %}selected{% endif %}>{{ category.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-3">
+            <select name="order" class="form-select">
+                <option value="recenti" {% if request.GET.order == "recenti" %}selected{% endif %}>Più recenti</option>
+                <option value="popolari" {% if request.GET.order == "popolari" %}selected{% endif %}>Più popolari</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-primary w-100">Filtra</button>
+        </div>
     </form>
 
     <div class="row">
         {% for petition in petitions %}
-            <div class="col-md-4">
-                <h4><a href="{% url 'petitions:petition_detail' petition.pk %}">{{ petition.title }}</a></h4>
-                <p>{{ petition.description|truncatewords:20 }}</p>
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 shadow-sm">
+                    {% if petition.image %}
+                        <img src="{{ petition.image.url }}" class="card-img-top" alt="{{ petition.title }}">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <a href="{% url 'petitions:petition_detail' petition.pk %}">{{ petition.title }}</a>
+                        </h5>
+                        <p class="card-text">{{ petition.description|truncatewords:25 }}</p>
+                    </div>
+                    <div class="card-footer text-muted small">
+                        Categoria: {{ petition.category }}<br>
+                        Creato il: {{ petition.created_at|date:"d/m/Y" }}
+                    </div>
+                </div>
             </div>
         {% empty %}
-            <p>Nessuna petizione trovata.</p>
+            <div class="col-12">
+                <p class="text-muted">Nessuna petizione trovata.</p>
+            </div>
         {% endfor %}
     </div>
 
-    <div class="pagination">
+    <div class="pagination mt-4 d-flex justify-content-center align-items-center gap-3">
         {% if page_obj.has_previous %}
-            <a href="?page={{ page_obj.previous_page_number }}">«</a>
+            <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-outline-secondary">&laquo;</a>
         {% endif %}
         <span>Pagina {{ page_obj.number }} di {{ page_obj.paginator.num_pages }}</span>
         {% if page_obj.has_next %}
-            <a href="?page={{ page_obj.next_page_number }}">»</a>
+            <a href="?page={{ page_obj.next_page_number }}" class="btn btn-outline-secondary">&raquo;</a>
         {% endif %}
     </div>
 </div>

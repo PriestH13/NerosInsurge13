@@ -3,31 +3,52 @@
 
 {% block page_content %}{% endblock %} 
 {% block content %}
-<main class="main-content">
+<main class="main-content py-5">
     <div class="container">
-        <div class="petition-card">
-            <div class="petition-image">
+        <div class="petition-card d-flex flex-column flex-md-row shadow rounded overflow-hidden">
+            
+            <!-- Immagine della petizione -->
+            <div class="petition-image col-md-5 p-0">
                 {% if petition.attachments.first %}
-                    <img src="{{ petition.attachments.first.file.url }}" alt="{{ petition.title }}">
+                    <img src="{{ petition.attachments.first.file.url }}" alt="{{ petition.title }}" class="img-fluid w-100 h-100 object-fit-cover">
                 {% else %}
-                    <img src="{% static 'images/sample-petition.jpg' %}" alt="{{ petition.title }}">
+                    <img src="{% static 'images/sample-petition.jpg' %}" alt="Default petition image" class="img-fluid w-100 h-100 object-fit-cover">
                 {% endif %}
             </div>
-            <div class="petition-content">
-                <span class="category">{{ petition.category.name|default:"Uncategorized" }}</span>
-                <h3>{{ petition.title }}</h3>
-                <p class="description">{{ petition.description }}</p>
-                <div class="progress-container">
-                    <div class="progress-bar" style="width: {{ petition.signatures.count|default:0|floatformat:0 }}%"></div>
-                    <span>{{ petition.signatures.count|default:0 }} firme su 10,000</span>
+
+            <!-- Contenuto della petizione -->
+            <div class="petition-content col-md-7 p-4 d-flex flex-column justify-content-between">
+                <div>
+                    <span class="badge bg-secondary mb-2">{{ petition.category.name|default:"Uncategorized" }}</span>
+                    <h3 class="mb-3">{{ petition.title }}</h3>
+                    <p class="description mb-4">{{ petition.description }}</p>
+                    
+                    <!-- Barra di avanzamento -->
+                    <div class="mb-3">
+                        <div class="progress" style="height: 20px;">
+                            <div class="progress-bar bg-success" role="progressbar"
+                                 style="width: {{ petition.signatures.count|floatformat:0|default:0|divisibleby:100 }}%; max-width: 100%;"
+                                 aria-valuenow="{{ petition.signatures.count }}"
+                                 aria-valuemin="0" aria-valuemax="10000">
+                                {{ petition.signatures.count|default:0 }} firme
+                            </div>
+                        </div>
+                        <small class="text-muted">Su un obiettivo di 10.000 firme</small>
+                    </div>
                 </div>
-                <div class="petition-meta">
-                    <span><i class="fas fa-user"></i> {{ petition.created_by.username }}</span>
-                    <span><i class="fas fa-calendar"></i> {{ petition.created_at|date:"d M Y" }}</span>
+
+                <!-- Metadati -->
+                <div class="petition-meta d-flex justify-content-between align-items-center mt-4 text-muted small">
+                    <span><i class="fas fa-user me-1"></i> {{ petition.created_by.username }}</span>
+                    <span><i class="fas fa-calendar-alt me-1"></i> {{ petition.created_at|date:"d M Y" }}</span>
                 </div>
+
+                <!-- Azioni admin -->
                 {% if user.is_authenticated %}
-                    <a href="{% url 'petitions:petition_edit' petition.pk %}" class="button">Edit Petition</a>
-                    <a href="{% url 'petitions:petition_delete' petition.pk %}" class="button">Delete Petition</a>
+                    <div class="mt-4 d-flex gap-2">
+                        <a href="{% url 'petitions:petition_edit' petition.pk %}" class="btn btn-outline-primary btn-sm">Modifica</a>
+                        <a href="{% url 'petitions:petition_delete' petition.pk %}" class="btn btn-outline-danger btn-sm">Elimina</a>
+                    </div>
                 {% endif %}
             </div>
         </div>

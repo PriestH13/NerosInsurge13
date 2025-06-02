@@ -33,6 +33,7 @@ class Petition(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=20, choices=PetitionStatus.choices, default=PetitionStatus.DRAFT)
     is_active = models.BooleanField(default=True)
+    image = models.ImageField(upload_to='petitions/images/', null=True, blank=True)
 
     def __str__(self):
         return self.title

@@ -1,26 +1,71 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block page_content %}{% endblock %} 
+{% block page_content %}{% endblock %}
 {% block content %}
 <div class="container mt-5">
     <h2>{% if form.instance.pk %}Modifica Petizione{% else %}Crea Petizione{% endif %}</h2>
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {{ form.non_field_errors }}
+
         <div class="mb-3">
             {{ form.title.label_tag }}
             {{ form.title }}
         </div>
+
         <div class="mb-3">
             {{ form.description.label_tag }}
             {{ form.description }}
         </div>
+
         <div class="mb-3">
             {{ form.category.label_tag }}
             {{ form.category }}
         </div>
+
+        <div class="mb-3">
+            {{ form.tags.label_tag }}
+            {{ form.tags }}
+        </div>
+
+        <div class="mb-3">
+            {{ form.status.label_tag }}
+            {{ form.status }}
+        </div>
+
+        <div class="mb-3">
+            {{ form.image.label_tag }}
+            {{ form.image }}
+            <div id="image-preview-container" class="mt-2">
+                {% if form.instance.image %}
+                    <img id="image-preview" src="{{ form.instance.image.url }}" alt="Current Image" style="max-width: 200px; max-height: 200px;">
+                {% else %}
+                    <img id="image-preview" src="#" alt="Preview" style="display:none; max-width: 200px; max-height: 200px;">
+                {% endif %}
+            </div>
+        </div>
+
         <button type="submit" class="btn btn-primary">Salva</button>
     </form>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const input = document.querySelector('input[type="file"][name="image"]');
+        const preview = document.getElementById('image-preview');
+
+        input.addEventListener('change', function (event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    });
+</script>
 {% endblock %}

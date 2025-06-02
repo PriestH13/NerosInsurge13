@@ -4,12 +4,17 @@
 {% block page_content %}{% endblock %} 
 {% block content %}
 <div class="container mt-5">
-    <h2>Elimina Petizione</h2>
-    <p>Sei sicuro di voler eliminare "{{ petition.title }}"?</p>
-    <form method="post">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-danger">Conferma</button>
-        <a href="{% url 'petitions:petition_detail' petition.pk %}" class="btn btn-secondary">Annulla</a>
-    </form>
+    <div class="card shadow rounded p-4">
+        <h2 class="mb-4 text-danger">Elimina Petizione</h2>
+        <p>Sei sicuro di voler eliminare la petizione <strong>"{{ petition.title }}"</strong>? Questa azione non può essere annullata.</p>
+        
+        <form method="post" class="mt-4">
+            {% csrf_token %}
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-danger">Conferma Eliminazione</button>
+                <a href="{% url 'petitions:petition_detail' petition.pk %}" class="btn btn-secondary">Annulla</a>
+            </div>
+        </form>
+    </div>
 </div>
 {% endblock %}
