@@ -1086,3 +1086,35 @@ main.main-content {
         font-size: 1.5rem;
     }
 }
+.global-search {
+    background: var(--light-gray);
+    padding: 1rem 0;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.search-form {
+    display: flex;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.search-form input {
+    flex: 1;
+    padding: 0.6rem;
+    border: 1px solid #ccc;
+    border-radius: 4px 0 0 4px;
+    font-size: 1rem;
+}
+
+.search-form button {
+    padding: 0.6rem 1rem;
+    border: none;
+    background: var(--primary-color);
+    color: white;
+    border-radius: 0 4px 4px 0;
+    cursor: pointer;
+}
+
+.search-form button:hover {
+    background: var(--primary-dark);
+}

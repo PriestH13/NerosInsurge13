@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/create.css' %}">
+{% endblock %}
+
+{% block content %}
+<main class="main-content">
+  <div class="container" style="text-align: center; padding: 40px;">
+    {% if success %}
+      <h2>Firma confermata!</h2>
+      <p>Grazie per aver firmato la petizione "{{ petition.title }}".</p>
+      <a href="{% url 'petitions:petition_detail' petition.pk %}" class="button primary">Torna alla petizione</a>
+    {% else %}
+      <h2>Token non valido o scaduto.</h2>
+      <p>La conferma della firma non è andata a buon fine.</p>
+      <a href="{% url 'petitions:list' %}" class="button outline">Torna alla lista petizioni</a>
+    {% endif %}
+  </div>
+</main>
+{% endblock %}

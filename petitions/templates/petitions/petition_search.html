@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}Ricerca Petizioni{% endblock %}
+{% block page_content %}{% endblock %}
+
+{% block content %}
+<h1>Ricerca Petizioni</h1>
+
+<form method="GET" action="{% url 'petitions:petition_search' %}">
+    <input type="text" name="q" placeholder="Cerca petizioni..." value="{{ query }}" required>
+    <button type="submit">Cerca</button>
+</form>
+
+<hr>
+
+{% if query %}
+    <h2>Risultati per: "{{ query }}"</h2>
+
+    {% if results %}
+        <ul>
+            {% for petition in results %}
+            <li>
+                <a href="{% url 'petitions:petition_detail' petition.pk %}">
+                    {{ petition.title }}
+                </a><br>
+                <small>{{ petition.description|truncatewords:20 }}</small><br>
+<small><strong>Categoria:</strong> 
+    {% if petition.category %}
+        {{ petition.category.name }}
+    {% else %}
+        Nessuna
+    {% endif %}
+</small>
+            </li>
+            {% endfor %}
+        </ul>
+
+        {% if is_paginated %}
+            <div>
+                {% if page_obj.has_previous %}
+                    <a href="?q={{ query }}&page={{ page_obj.previous_page_number }}">Precedente</a>
+                {% endif %}
+                <span>Pagina {{ page_obj.number }} di {{ page_obj.paginator.num_pages }}</span>
+                {% if page_obj.has_next %}
+                    <a href="?q={{ query }}&page={{ page_obj.next_page_number }}">Successiva</a>
+                {% endif %}
+            </div>
+        {% endif %}
+
+    {% else %}
+        <p>Nessuna petizione trovata.</p>
+    {% endif %}
+{% else %}
+    <p>Inserisci un termine di ricerca per trovare una petizione.</p>
+{% endif %}
+
+{% endblock %}

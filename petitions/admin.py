@@ -22,18 +22,14 @@ class PetitionAdmin(admin.ModelAdmin):
     autocomplete_fields = ('created_by', 'tags')
 
 
+
+
 @admin.register(Signature)
 class SignatureAdmin(admin.ModelAdmin):
-    list_display = ('petition', 'user', 'signed_at')
-    search_fields = ('petition__title', 'user__username')
+    list_display = ('petition', 'email', 'signed_at')
+    search_fields = ('petition__title', 'email')
     list_filter = ('signed_at',)
 
-
-@admin.register(Comment)
-class CommentAdmin(admin.ModelAdmin):
-    list_display = ('petition', 'user', 'created_at')
-    search_fields = ('petition__title', 'user__username', 'content')
-    list_filter = ('created_at',)
 
 
 @admin.register(PetitionVote)

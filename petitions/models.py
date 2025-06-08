@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+import uuid
 
 #CATEGORIA
 class PetitionCategory(models.Model):
@@ -41,14 +42,26 @@ class Petition(models.Model):
 #FIRMA
 class Signature(models.Model):
     petition = models.ForeignKey(Petition, on_delete=models.CASCADE, related_name='signatures')
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='signatures')
+    email = models.EmailField(null=True, blank=True)
     signed_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        unique_together = ('petition', 'user')
+        unique_together = ('petition', 'email')
 
     def __str__(self):
-        return f"{self.user.username} signed '{self.petition.title}'"
+        return f"{self.email} signed '{self.petition.title}'"
+
+
+class PendingSignature(models.Model):
+    petition = models.ForeignKey(Petition, on_delete=models.CASCADE, related_name='pending_signatures')
+    email = models.EmailField()
+    token = models.UUIDField(default=uuid.uuid4, unique=True)
+    confirmed = models.BooleanField(default=False)
+    requested_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.email} - {'Confirmed' if self.confirmed else 'Pending'}"
+
 
 #COMMENTO
 class Comment(models.Model):

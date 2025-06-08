@@ -5,7 +5,8 @@ from .views import (
     PetitionDetailView,
     PetitionCreateView,
     PetitionUpdateView,
-    PetitionDeleteView
+    PetitionDeleteView,RequestSignatureView,
+    ConfirmSignatureView,PetitionSearchView
 )
 
 app_name = 'petitions'
@@ -19,4 +20,9 @@ urlpatterns = [
     path('<int:pk>/', PetitionDetailView.as_view(), name='petition_detail'),
     path('<int:pk>/edit/', PetitionUpdateView.as_view(), name='petition_edit'),
     path('<int:pk>/delete/', PetitionDeleteView.as_view(), name='petition_delete'),
+    path('search/', PetitionSearchView.as_view(), name='petition_search'),
+
+
+    path('petizione/<int:pk>/firma/', RequestSignatureView.as_view(), name='request_signature'),
+    path('firma/conferma/<uuid:token>/', ConfirmSignatureView.as_view(), name='confirm_signature'),
 ]

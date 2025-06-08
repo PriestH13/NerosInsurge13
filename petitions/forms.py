@@ -18,3 +18,7 @@ class PetitionForm(forms.ModelForm):
         self.fields['category'].empty_label = "Select a category"
         self.fields['tags'].required = False
         self.fields['image'].required = False
+
+class SignatureForm(forms.Form):
+    email = forms.EmailField(label='La tua email')
+

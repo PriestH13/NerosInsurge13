@@ -1,10 +1,13 @@
 from django.urls import reverse_lazy
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.shortcuts import get_object_or_404, redirect
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, FormView, View
 from django.db.models import Count, Q
-from .models import Petition, PetitionStatus, PetitionCategory
-from .forms import PetitionForm
+from .models import Petition, PetitionStatus, PetitionCategory, Signature, PendingSignature
+from .forms import PetitionForm, SignatureForm
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.http import HttpResponseForbidden
+from django.contrib import messages
+from django.core.mail import send_mail
 
 class HomeView(ListView):
     model = Petition
@@ -123,3 +126,74 @@ class PetitionDeleteView(LoginRequiredMixin, DeleteView):
             return Petition.objects.all()
         return Petition.objects.filter(created_by=self.request.user)
 
+class PetitionSearchView(ListView):
+    model = Petition
+    template_name = 'petitions/petition_search.html'
+    context_object_name = 'results'
+    paginate_by = 6
+
+    def get_queryset(self):
+        query = self.request.GET.get('q', '')
+        qs = Petition.objects.filter(status=PetitionStatus.PUBLISHED, is_active=True)
+        if query:
+            qs = qs.filter(
+                Q(title__icontains=query) | Q(description__icontains=query)
+            ).order_by('-created_at')
+        else:
+            qs = qs.none()
+        return qs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['query'] = self.request.GET.get('q', '')
+        context['categories'] = PetitionCategory.objects.all()
+        return context
+
+class RequestSignatureView(FormView):
+    form_class = SignatureForm
+    template_name = 'petitions/request_signature.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        self.petition = get_object_or_404(Petition, pk=kwargs['pk'])
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['petition'] = self.petition
+        return context
+
+    def form_valid(self, form):
+        email = form.cleaned_data['email']
+        petition = self.petition
+
+        if Signature.objects.filter(petition=petition, email=email).exists():
+            messages.info(self.request, "Hai già firmato questa petizione con questa email.")
+        else:
+            pending = PendingSignature.objects.create(petition=petition, email=email)
+            confirm_url = self.request.build_absolute_uri(
+                reverse('petitions:confirm_signature', kwargs={'token': pending.token})
+            )
+            send_mail(
+                subject='Conferma la tua firma',
+                message=f'Clicca per confermare la firma:\n{confirm_url}',
+                from_email='noreply@tuosito.it',
+                recipient_list=[email],
+            )
+            messages.success(self.request, "Ti abbiamo inviato un'email per confermare la firma.")
+        return redirect('petitions:petition_detail', pk=petition.pk)
+
+
+class ConfirmSignatureView(View):
+    def get(self, request, token):
+        try:
+            pending = PendingSignature.objects.get(token=token, confirmed=False)
+        except PendingSignature.DoesNotExist:
+            messages.error(request, "Link non valido o firma già confermata.")
+            return redirect('petitions:home')  # o 'home' se è fuori dal namespace
+
+        Signature.objects.create(petition=pending.petition, email=pending.email)
+        pending.confirmed = True
+        pending.save()
+
+        messages.success(request, "La tua firma è stata confermata!")
+        return redirect('petitions:petition_detail', pk=pending.petition.pk)
