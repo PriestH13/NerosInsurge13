@@ -1,71 +1,117 @@
 {% extends 'base.html' %}
 {% load static %}
-
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/create.css' %}">
+{% endblock %}
 {% block content %}
-<div class="container mt-5">
-    <h2 class="mb-4">Tutte le Petizioni</h2>
+<main class="main-content">
+    <div class="container">
+        <h2 class="section-title">Tutte le Petizioni</h2>
 
-    <form method="get" class="row g-2 mb-4 align-items-end">
-        <div class="col-md-4">
-            <input type="text" name="q" class="form-control" placeholder="Cerca..." value="{{ request.GET.q }}">
-        </div>
-        <div class="col-md-3">
-            <select name="category" class="form-select">
-                <option value="">Tutte le categorie</option>
-                {% for category in categories %}
-                    <option value="{{ category.name }}" {% if category.name == request.GET.category %}selected{% endif %}>{{ category.name }}</option>
-                {% endfor %}
-            </select>
-        </div>
-        <div class="col-md-3">
-            <select name="order" class="form-select">
-                <option value="recenti" {% if request.GET.order == "recenti" %}selected{% endif %}>Più recenti</option>
-                <option value="popolari" {% if request.GET.order == "popolari" %}selected{% endif %}>Più popolari</option>
-            </select>
-        </div>
-        <div class="col-md-2">
-            <button type="submit" class="btn btn-primary w-100">Filtra</button>
-        </div>
-    </form>
+        <form method="get" class="search-filters">
+            <div class="search-bar">
+                <input type="text" name="q" placeholder="Cerca petizioni..." value="{{ request.GET.q }}">
+                <button type="submit" aria-label="Cerca">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+            
+            <div class="filters">
+                <select name="category">
+                    <option value="">Tutte le categorie</option>
+                    {% for category in categories %}
+                        <option value="{{ category.name }}" {% if category.name == request.GET.category %}selected{% endif %}>
+                            {{ category.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+                
+                <select name="order">
+                    <option value="recenti" {% if request.GET.order == "recenti" %}selected{% endif %}>Più recenti</option>
+                    <option value="popolari" {% if request.GET.order == "popolari" %}selected{% endif %}>Più popolari</option>
+                </select>
+                
+                <button type="submit" class="button primary">
+                    <i class="fas fa-filter"></i> Filtra
+                </button>
+            </div>
+        </form>
 
-    <div class="row">
-        {% for petition in petitions %}
-            <div class="col-md-4 mb-4">
-                <div class="card h-100 shadow-sm">
+        <div class="petitions-grid">
+            {% for petition in petitions %}
+                <div class="petition-card animate-fade">
                     {% if petition.image %}
-                        <img src="{{ petition.image.url }}" class="card-img-top" alt="{{ petition.title }}">
+                        <div class="petition-image">
+                            <img src="{{ petition.image.url }}" alt="{{ petition.title }}">
+                            <span class="category-badge">{{ petition.category }}</span>
+                        </div>
                     {% endif %}
-                    <div class="card-body">
-                        <h5 class="card-title">
-                            <a href="{% url 'petitions:petition_detail' petition.pk %}">{{ petition.title }}</a>
-                        </h5>
-                        <p class="card-text">{{ petition.description|truncatewords:25 }}</p>
-
+                    
+                    <div class="petition-content">
+                        <h3>
+                            <a href="{% url 'petitions:petition_detail' petition.pk %}">
+                                {{ petition.title }}
+                            </a>
+                        </h3>
+                        <p class="description">{{ petition.description|truncatewords:25 }}</p>
+                        
+                        <div class="progress-container">
+                            <div class="progress-text">
+                                <span>{{ petition.signature_count }} firme</span>
+                                <span>Obiettivo: {{ petition.goal }}</span>
+                            </div>
+                            <div class="progress-bar-container">
+                                <div class="progress-bar" style="width: {{ petition.progress_percentage }}%"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="petition-meta">
+                            <span><i class="far fa-calendar-alt"></i> {{ petition.created_at|date:"d/m/Y" }}</span>
+                            <span><i class="fas fa-user"></i> {{ petition.created_by.username }}</span>
+                        </div>
+                        
                         {% if user.is_authenticated and petition.created_by == user %}
-                            <a href="{% url 'petitions:petition_edit' petition.pk %}" class="btn btn-sm btn-warning mt-2">Modifica</a>
+                            <a href="{% url 'petitions:petition_edit' petition.pk %}" class="button outline" style="margin-top: 15px;">
+                                <i class="fas fa-edit"></i> Modifica
+                            </a>
                         {% endif %}
                     </div>
-                    <div class="card-footer text-muted small">
-                        Categoria: {{ petition.category }}<br>
-                        Creato il: {{ petition.created_at|date:"d/m/Y" }}
-                    </div>
                 </div>
-            </div>
-        {% empty %}
-            <div class="col-12">
-                <p class="text-muted">Nessuna petizione trovata.</p>
-            </div>
-        {% endfor %}
-    </div>
+            {% empty %}
+                <div class="text-center" style="grid-column: 1/-1;">
+                    <p style="color: var(--gray); font-size: 1.1rem;">Nessuna petizione trovata.</p>
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'petitions:petition_create' %}" class="button primary" style="margin-top: 15px;">
+                            <i class="fas fa-plus"></i> Crea la tua prima petizione
+                        </a>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
 
-    <div class="pagination mt-4 d-flex justify-content-center align-items-center gap-3">
-        {% if page_obj.has_previous %}
-            <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-outline-secondary">&laquo;</a>
-        {% endif %}
-        <span>Pagina {{ page_obj.number }} di {{ page_obj.paginator.num_pages }}</span>
-        {% if page_obj.has_next %}
-            <a href="?page={{ page_obj.next_page_number }}" class="btn btn-outline-secondary">&raquo;</a>
+        {% if page_obj.paginator.num_pages > 1 %}
+        <div class="pagination">
+            {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}" class="button outline">
+                    <i class="fas fa-chevron-left"></i>
+                </a>
+            {% endif %}
+            
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                    <a href="?page={{ num }}" class="button primary">{{ num }}</a>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <a href="?page={{ num }}" class="button outline">{{ num }}</a>
+                {% endif %}
+            {% endfor %}
+            
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}" class="button outline">
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+            {% endif %}
+        </div>
         {% endif %}
     </div>
-</div>
+</main>
 {% endblock %}

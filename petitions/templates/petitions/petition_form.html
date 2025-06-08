@@ -1,59 +1,100 @@
 {% extends 'base.html' %}
 {% load static %}
-
-{% block page_content %}{% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/create.css' %}">
+{% endblock %}
 {% block content %}
-<div class="container mt-5">
-    <h2>{% if form.instance.pk %}Modifica Petizione{% else %}Crea Petizione{% endif %}</h2>
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ form.non_field_errors }}
+<main class="main-content">
+    <div class="container" style="max-width: 600px; margin: 0 auto;">
+        <h2 class="section-title" style="text-align: left; margin-bottom: 1.5rem;">
+            {% if form.instance.pk %}Modifica Petizione{% else %}Crea Petizione{% endif %}
+        </h2>
+        
+        <form method="post" enctype="multipart/form-data" class="petition-form">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
 
-        <div class="mb-3">
-            {{ form.title.label_tag }}
-            {{ form.title }}
-        </div>
-
-        <div class="mb-3">
-            {{ form.description.label_tag }}
-            {{ form.description }}
-        </div>
-
-        <div class="mb-3">
-            {{ form.category.label_tag }}
-            {{ form.category }}
-        </div>
-
-        <div class="mb-3">
-            {{ form.tags.label_tag }}
-            {{ form.tags }}
-        </div>
-
-        <div class="mb-3">
-            {{ form.status.label_tag }}
-            {{ form.status }}
-        </div>
-
-        <div class="mb-3">
-            {{ form.image.label_tag }}
-            {{ form.image }}
-            <div id="image-preview-container" class="mt-2">
-                {% if form.instance.image %}
-                    <img id="image-preview" src="{{ form.instance.image.url }}" alt="Current Image" style="max-width: 200px; max-height: 200px;">
-                {% else %}
-                    <img id="image-preview" src="#" alt="Preview" style="display:none; max-width: 200px; max-height: 200px;">
+            <div class="form-group">
+                {{ form.title.label_tag }}
+                {{ form.title }}
+                {% if form.title.errors %}
+                    <div class="error-message">{{ form.title.errors }}</div>
                 {% endif %}
             </div>
-        </div>
 
-        <button type="submit" class="btn btn-primary">Salva</button>
-    </form>
-</div>
+            <div class="form-group">
+                {{ form.description.label_tag }}
+                {{ form.description }}
+                {% if form.description.errors %}
+                    <div class="error-message">{{ form.description.errors }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    {{ form.category.label_tag }}
+                    {{ form.category }}
+                    {% if form.category.errors %}
+                        <div class="error-message">{{ form.category.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    {{ form.status.label_tag }}
+                    {{ form.status }}
+                    {% if form.status.errors %}
+                        <div class="error-message">{{ form.status.errors }}</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="form-group">
+                {{ form.tags.label_tag }}
+                {{ form.tags }}
+                <small class="form-hint">Separate i tag con virgole</small>
+                {% if form.tags.errors %}
+                    <div class="error-message">{{ form.tags.errors }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                {{ form.image.label_tag }}
+                <div class="file-upload">
+                    {{ form.image }}
+                    <label for="{{ form.image.id_for_label }}" class="file-upload-label">
+                        <i class="fas fa-cloud-upload-alt"></i> Scegli un'immagine
+                    </label>
+                </div>
+                <div id="image-preview-container" class="image-preview">
+                    {% if form.instance.image %}
+                        <img id="image-preview" src="{{ form.instance.image.url }}" alt="Current Image">
+                    {% else %}
+                        <img id="image-preview" src="#" alt="Preview" style="display:none;">
+                    {% endif %}
+                </div>
+                {% if form.image.errors %}
+                    <div class="error-message">{{ form.image.errors }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="button primary">
+                    <i class="fas fa-save"></i> {% if form.instance.pk %}Aggiorna{% else %}Crea{% endif %}
+                </button>
+                <a href="{% if form.instance.pk %}{% url 'petitions:petition_detail' form.instance.pk %}{% else %}{% url 'petitions:petition_list' %}{% endif %}" 
+                   class="button outline">
+                    <i class="fas fa-times"></i> Annulla
+                </a>
+            </div>
+        </form>
+    </div>
+</main>
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const input = document.querySelector('input[type="file"][name="image"]');
         const preview = document.getElementById('image-preview');
+        const fileLabel = document.querySelector('.file-upload-label');
 
         input.addEventListener('change', function (event) {
             const file = event.target.files[0];
@@ -62,6 +103,7 @@
                 reader.onload = function (e) {
                     preview.src = e.target.result;
                     preview.style.display = 'block';
+                    fileLabel.innerHTML = `<i class="fas fa-check"></i> ${file.name}`;
                 };
                 reader.readAsDataURL(file);
             }

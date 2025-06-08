@@ -1,20 +1,49 @@
 {% extends 'base.html' %}
 {% load static %}
-
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/create.css' %}">
+<script src="{% static 'js/register.js' %}" defer></script>
+{% endblock %}
 {% block page_content %}{% endblock %} 
 {% block content %}
-<div class="container mt-5">
-    <div class="card shadow rounded p-4">
-        <h2 class="mb-4 text-danger">Elimina Petizione</h2>
-        <p>Sei sicuro di voler eliminare la petizione <strong>"{{ petition.title }}"</strong>? Questa azione non può essere annullata.</p>
-        
-        <form method="post" class="mt-4">
-            {% csrf_token %}
-            <div class="d-flex gap-2">
-                <button type="submit" class="btn btn-danger">Conferma Eliminazione</button>
-                <a href="{% url 'petitions:petition_detail' petition.pk %}" class="btn btn-secondary">Annulla</a>
-            </div>
-        </form>
-    </div>
+<div style="max-width: 600px; margin: 3rem auto; padding: 1rem;">
+  <div style="
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    border-radius: 8px;
+    padding: 2rem;
+    background-color: white;
+  ">
+    <h2 style="margin-bottom: 1.5rem; color: #dc3545;">Elimina Petizione</h2>
+    <p>Sei sicuro di voler eliminare la petizione <strong>"{{ petition.title }}"</strong>? Questa azione non può essere annullata.</p>
+    
+    <form method="post" style="margin-top: 1.5rem;">
+      {% csrf_token %}
+      <div style="display: flex; gap: 1rem;">
+        <button type="submit" style="
+          background-color: #dc3545;
+          color: white;
+          border: none;
+          padding: 0.5rem 1rem;
+          border-radius: 4px;
+          cursor: pointer;
+          font-size: 1rem;
+          flex-grow: 1;
+        ">Conferma Eliminazione</button>
+        <a href="{% url 'petitions:petition_detail' petition.pk %}" style="
+          background-color: #6c757d;
+          color: white;
+          text-decoration: none;
+          padding: 0.5rem 1rem;
+          border-radius: 4px;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          flex-grow: 1;
+          font-size: 1rem;
+          cursor: pointer;
+        ">Annulla</a>
+      </div>
+    </form>
+  </div>
 </div>
 {% endblock %}

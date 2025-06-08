@@ -1,46 +1,50 @@
 {% extends 'base.html' %}
 
 {% block page_content %}{% endblock %} 
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/create.css' %}">
+<script src="{% static 'js/register.js' %}" defer></script>
+{% endblock %}
 {% block content %}
-<div class="container mt-5">
+<div style="max-width: 600px; margin: 40px auto; padding: 10px;">
   <h2>Update Petition</h2>
-  <form method="post" enctype="multipart/form-data" class="mt-4">
+  <form method="post" enctype="multipart/form-data" style="margin-top: 20px;">
     {% csrf_token %}
     
-    <div class="mb-3">
-      <label for="{{ form.title.id_for_label }}" class="form-label">Title</label>
+    <div style="margin-bottom: 20px;">
+      <label for="{{ form.title.id_for_label }}" style="display: block; font-weight: bold; margin-bottom: 6px;">Title</label>
       {{ form.title }}
     </div>
 
-    <div class="mb-3">
-      <label for="{{ form.description.id_for_label }}" class="form-label">Description</label>
+    <div style="margin-bottom: 20px;">
+      <label for="{{ form.description.id_for_label }}" style="display: block; font-weight: bold; margin-bottom: 6px;">Description</label>
       {{ form.description }}
     </div>
 
-    <div class="mb-3">
-      <label for="{{ form.category.id_for_label }}" class="form-label">Category</label>
+    <div style="margin-bottom: 20px;">
+      <label for="{{ form.category.id_for_label }}" style="display: block; font-weight: bold; margin-bottom: 6px;">Category</label>
       {{ form.category }}
     </div>
 
-    <div class="mb-3">
-      <label for="{{ form.tags.id_for_label }}" class="form-label">Tags</label>
+    <div style="margin-bottom: 20px;">
+      <label for="{{ form.tags.id_for_label }}" style="display: block; font-weight: bold; margin-bottom: 6px;">Tags</label>
       {{ form.tags }}
     </div>
 
-    <div class="mb-3">
-      <label for="{{ form.image.id_for_label }}" class="form-label">Image</label>
+    <div style="margin-bottom: 20px;">
+      <label for="{{ form.image.id_for_label }}" style="display: block; font-weight: bold; margin-bottom: 6px;">Image</label>
       {{ form.image }}
-      <div class="mt-2">
+      <div style="margin-top: 10px;">
         {% if form.instance.image %}
-          <img id="image-preview" src="{{ form.instance.image.url }}" alt="Current Image" style="max-height: 200px;">
+          <img id="image-preview" src="{{ form.instance.image.url }}" alt="Current Image" style="max-height: 200px; display: block;">
         {% else %}
           <img id="image-preview" src="#" alt="Preview" style="display:none; max-height: 200px;">
         {% endif %}
       </div>
     </div>
 
-    <button type="submit" class="btn btn-primary">Update Petition</button>
-    <a href="{% url 'petition_list' %}" class="btn btn-secondary">Cancel</a>
+    <button type="submit" style="padding: 10px 20px; background-color: #007bff; color: white; border: none; cursor: pointer;">Update Petition</button>
+    <a href="{% url 'petition_list' %}" style="margin-left: 15px; padding: 10px 20px; background-color: #6c757d; color: white; text-decoration: none; display: inline-block;">Cancel</a>
   </form>
 </div>
 

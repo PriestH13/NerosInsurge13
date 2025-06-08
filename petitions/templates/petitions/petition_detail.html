@@ -1,57 +1,85 @@
 {% extends 'base.html' %}
 {% load static %}
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/create.css' %}">
+<link rel="stylesheet" href="{% static 'css/petition_detail.css' %}">
+<script src="{% static 'js/register.js' %}" defer></script>
+{% endblock %}
 
-{% block page_content %}{% endblock %} 
 {% block content %}
-<main class="main-content py-5">
-    <div class="container">
-        <div class="petition-card d-flex flex-column flex-md-row shadow rounded overflow-hidden">
-            
-            <!-- Immagine della petizione -->
-            <div class="petition-image col-md-5 p-0">
-                {% if petition.attachments.first %}
-                    <img src="{{ petition.attachments.first.file.url }}" alt="{{ petition.title }}" class="img-fluid w-100 h-100 object-fit-cover">
-                {% else %}
-                    <img src="{% static 'images/sample-petition.jpg' %}" alt="Default petition image" class="img-fluid w-100 h-100 object-fit-cover">
-                {% endif %}
-            </div>
-
-            <!-- Contenuto della petizione -->
-            <div class="petition-content col-md-7 p-4 d-flex flex-column justify-content-between">
-                <div>
-                    <span class="badge bg-secondary mb-2">{{ petition.category.name|default:"Uncategorized" }}</span>
-                    <h3 class="mb-3">{{ petition.title }}</h3>
-                    <p class="description mb-4">{{ petition.description }}</p>
-                    
-                    <!-- Barra di avanzamento -->
-                    <div class="mb-3">
-                        <div class="progress" style="height: 20px;">
-                            <div class="progress-bar bg-success" role="progressbar"
-                                 style="width: {{ petition.signatures.count|floatformat:0|default:0|divisibleby:100 }}%; max-width: 100%;"
-                                 aria-valuenow="{{ petition.signatures.count }}"
-                                 aria-valuemin="0" aria-valuemax="10000">
-                                {{ petition.signatures.count|default:0 }} firme
-                            </div>
-                        </div>
-                        <small class="text-muted">Su un obiettivo di 10.000 firme</small>
-                    </div>
-                </div>
-
-                <!-- Metadati -->
-                <div class="petition-meta d-flex justify-content-between align-items-center mt-4 text-muted small">
-                    <span><i class="fas fa-user me-1"></i> {{ petition.created_by.username }}</span>
-                    <span><i class="fas fa-calendar-alt me-1"></i> {{ petition.created_at|date:"d M Y" }}</span>
-                </div>
-
-                <!-- Azioni admin -->
-                {% if user.is_authenticated %}
-                    <div class="mt-4 d-flex gap-2">
-                        <a href="{% url 'petitions:petition_edit' petition.pk %}" class="btn btn-outline-primary btn-sm">Modifica</a>
-                        <a href="{% url 'petitions:petition_delete' petition.pk %}" class="btn btn-outline-danger btn-sm">Elimina</a>
-                    </div>
-                {% endif %}
-            </div>
-        </div>
+<main class="petition-detail-container">
+  <div class="petition-card">
+    <!-- Petition Image -->
+    <div class="petition-image">
+      {% if petition.attachments.first %}
+        <img src="{{ petition.attachments.first.file.url }}" 
+             alt="{{ petition.title }}" 
+             onerror="this.src='{% static 'images/sample-petition.jpg' %}'">
+      {% else %}
+        <img src="{% static 'images/sample-petition.jpg' %}" 
+             alt="Default petition image">
+      {% endif %}
     </div>
+
+    <!-- Petition Content -->
+    <div class="petition-content">
+      <div>
+        <span class="category-badge">
+          {{ petition.category.name|default:"Uncategorized" }}
+        </span>
+
+        <h1 class="petition-title">{{ petition.title }}</h1>
+
+        <p class="petition-description">{{ petition.description|linebreaksbr }}</p>
+
+        <!-- Progress Bar -->
+        <div class="progress-container">
+          <div class="progress-bar" role="progressbar" 
+               aria-valuenow="{{ petition.signatures.count }}" 
+               aria-valuemin="0" 
+               aria-valuemax="{{ petition.goal|default:10000 }}"
+               style="width: {% widthratio petition.signatures.count petition.goal|default:10000 100 %}%">
+            <span class="progress-text">{{ petition.signatures.count }} signatures</span>
+          </div>
+          <small class="progress-goal">Goal: {{ petition.goal|default:"10,000" }} signatures</small>
+        </div>
+      </div>
+
+      <!-- Metadata and Actions -->
+      <div class="petition-footer">
+        <div class="petition-meta">
+          <span class="meta-item">
+            <i class="fas fa-user"></i> {{ petition.created_by.username }}
+          </span>
+          <span class="meta-item">
+            <i class="fas fa-calendar-alt"></i> {{ petition.created_at|date:"d M Y" }}
+          </span>
+        </div>
+
+        <!-- Actions -->
+        <div class="petition-actions">
+          {% if user.is_authenticated and user == petition.created_by %}
+            <a href="{% url 'petitions:petition_edit' petition.pk %}" class="btn-edit">
+              Edit
+            </a>
+            <a href="{% url 'petitions:petition_delete' petition.pk %}" class="btn-delete">
+              Delete
+            </a>
+          {% endif %}
+          {% comment %} <a href="{% url 'petitions:sign_petition' petition.pk %}" class="btn-sign"> {% endcomment %}
+            Sign Petition
+          </a>
+        </div>
+
+        <!-- Social Sharing -->
+        <div class="social-sharing">
+          <span>Share:</span>
+          <a href="#" class="social-icon facebook"><i class="fab fa-facebook-f"></i></a>
+          <a href="#" class="social-icon twitter"><i class="fab fa-twitter"></i></a>
+          <a href="#" class="social-icon linkedin"><i class="fab fa-linkedin-in"></i></a>
+        </div>
+      </div>
+    </div>
+  </div>
 </main>
 {% endblock %}
