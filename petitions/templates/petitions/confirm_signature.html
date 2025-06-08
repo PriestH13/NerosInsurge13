@@ -4,9 +4,10 @@
 {% block extra_head %}
 <link rel="stylesheet" href="{% static 'css/create.css' %}">
 {% endblock %}
+{% block global_search %}{% endblock %}
 
 {% block content %}
-<main class="main-content">
+<main>
   <div class="container" style="text-align: center; padding: 40px;">
     {% if success %}
       <h2>Firma confermata!</h2>

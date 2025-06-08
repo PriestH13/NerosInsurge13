@@ -1,0 +1,9 @@
+{% load static %}
+<section class="global-search">
+    <div class="container">
+        <form action="{% url 'petitions:petition_search' %}" method="get" class="search-form">
+            <input type="text" name="q" placeholder="Cerca una petizione..." required>
+            <button type="submit"><i class="fas fa-search"></i></button>
+        </form>
+    </div>
+</section>

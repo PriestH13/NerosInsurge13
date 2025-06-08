@@ -1,45 +1,49 @@
+{% load static %}
+
 <section class="petitions-slider">
     <div class="slider-container">
         <div class="slider-header">
             <h2>Petizioni in evidenza</h2>
             <p>Unisciti a queste importanti cause e fai sentire la tua voce</p>
         </div>
-        
+
         <div class="petitions-carousel">
             <div class="petitions-wrapper" id="petitionsWrapper">
 
                 {% for petition in featured_petitions %}
                 <div class="petition-card">
-                    <div class="petition-image">
-                        {% if petition.image %}
-                            <img src="{{ petition.image.url }}" alt="{{ petition.title }}">
-                        {% else %}
-                            <img src="" alt="{{ petition.title }}">
-                        {% endif %}
-                    </div>
-                    <div class="petition-content">
-                        <h3>{{ petition.title }}</h3>
-                        <p>{{ petition.description|truncatewords:20 }}</p>
-                        
-                        <div class="progress-container">
-                            {% with percent=petition.get_signature_percentage %}
-                            <div class="progress-bar" style="width: {{ percent }}%"></div>
-                            {% endwith %}
+                    <a href="{% url 'petitions:petition_detail' petition.pk %}" class="petition-link">
+                        <div class="petition-image">
+                            {% if petition.image %}
+                                <img src="{{ petition.image.url }}" alt="{{ petition.title }}">
+                            {% else %}
+                                <img src="{% static 'images/default_petition.jpg' %}" alt="{{ petition.title }}">
+                            {% endif %}
                         </div>
-                        <div class="petition-meta">
-                            <span class="signatures-count">
-                                {{ petition.signatures.count }} firme su {{ petition.signature_goal }}
-                            </span>
-<a href="{% url 'petitions:request_signature' petition.pk %}" class="button primary" style="margin-top: 15px;">
-    Firma questa petizione
-</a>
+                        <div class="petition-content">
+                            <h3>{{ petition.title }}</h3>
+                            <p>{{ petition.description|truncatewords:20 }}</p>
+
+                            <div class="progress-container">
+                                {% with percent=petition.get_signature_percentage %}
+                                <div class="progress-bar" style="width: {{ percent }}%"></div>
+                                {% endwith %}
+                            </div>
                         </div>
+                    </a>
+                    <div class="petition-meta">
+                        <span class="signatures-count">
+                            {{ petition.signatures.count }} firme su {{ petition.signature_goal }}
+                        </span>
+                        <a href="{% url 'petitions:request_signature' petition.pk %}" class="button primary" style="margin-top: 15px;">
+                            Firma questa petizione
+                        </a>
                     </div>
                 </div>
                 {% endfor %}
 
             </div>
-            
+
             <div class="slider-nav">
                 <button class="slider-btn" id="prevBtn" aria-label="Slide precedente">
                     <i class="fas fa-chevron-left"></i>

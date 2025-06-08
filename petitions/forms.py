@@ -4,7 +4,7 @@ from .models import Petition, PetitionCategory, Tag
 class PetitionForm(forms.ModelForm):
     class Meta:
         model = Petition
-        fields = ['title', 'description', 'category', 'tags', 'image','status']
+        fields = ['title', 'description', 'category', 'tags', 'image','status','location']
         widgets = {
             'title': forms.TextInput(attrs={'placeholder': 'Enter petition title'}),
             'description': forms.Textarea(attrs={'placeholder': 'Describe your petition'}),
@@ -22,3 +22,17 @@ class PetitionForm(forms.ModelForm):
 class SignatureForm(forms.Form):
     email = forms.EmailField(label='La tua email')
 
+
+from django import forms
+from .models import Comment
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ['content']
+        widgets = {
+            'content': forms.Textarea(attrs={
+                'rows': 3,
+                'placeholder': 'Scrivi un commento...'
+            })
+        }

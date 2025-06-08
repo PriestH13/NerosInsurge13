@@ -35,6 +35,8 @@ class Petition(models.Model):
     status = models.CharField(max_length=20, choices=PetitionStatus.choices, default=PetitionStatus.DRAFT)
     is_active = models.BooleanField(default=True)
     image = models.ImageField(upload_to='petitions/images/', null=True, blank=True)
+    location = models.CharField(max_length=255, blank=True, help_text="Città o luogo associato alla petizione")
+
 
     def __str__(self):
         return self.title

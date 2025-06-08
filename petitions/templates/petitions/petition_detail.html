@@ -1,15 +1,18 @@
 {% extends 'base.html' %}
 {% load static %}
+
 {% block extra_head %}
 <link rel="stylesheet" href="{% static 'css/create.css' %}">
 <link rel="stylesheet" href="{% static 'css/petition_detail.css' %}">
 <script src="{% static 'js/register.js' %}" defer></script>
 {% endblock %}
-{% block page_content %}{% endblock %}
 
-{% block content %}
+{% block global_search %}{% endblock %}
+
+{% block page_content %}
 <main class="petition-detail-container">
-  <div class="petition-card">
+  <article class="petition-card">
+
     <!-- Petition Image -->
     <div class="petition-image">
       {% if petition.attachments.first %}
@@ -17,70 +20,83 @@
              alt="{{ petition.title }}" 
              onerror="this.src='{% static 'images/sample-petition.jpg' %}'">
       {% else %}
-        <img src="{% static 'images/sample-petition.jpg' %}" 
-             alt="Default petition image">
+        <img src="{% static 'images/sample-petition.jpg' %}" alt="Default petition image">
       {% endif %}
     </div>
 
-    <!-- Petition Content -->
+    <!-- Petition Details -->
     <div class="petition-content">
-      <div>
-        <span class="category-badge">
-          {{ petition.category.name|default:"Uncategorized" }}
-        </span>
-
+      <header class="petition-header">
+        <span class="category-badge">{{ petition.category.name|default:"Uncategorized" }}</span>
         <h1 class="petition-title">{{ petition.title }}</h1>
+      </header>
 
-        <p class="petition-description">{{ petition.description|linebreaksbr }}</p>
-
-        <!-- Progress Bar -->
-        <div class="progress-container">
-          <div class="progress-bar" role="progressbar" 
-               aria-valuenow="{{ petition.signatures.count }}" 
-               aria-valuemin="0" 
-               aria-valuemax="{{ petition.goal|default:10000 }}"
-               style="width: {% widthratio petition.signatures.count petition.goal|default:10000 100 %}%">
-            <span class="progress-text">{{ petition.signatures.count }} signatures</span>
-          </div>
-          <small class="progress-goal">Goal: {{ petition.goal|default:"10,000" }} signatures</small>
-        </div>
+      <div class="petition-description">
+        <p>{{ petition.description|linebreaksbr }}</p>
       </div>
 
-      <!-- Metadata and Actions -->
-      <div class="petition-footer">
-        <div class="petition-meta">
-          <span class="meta-item">
-            <i class="fas fa-user"></i> {{ petition.created_by.username }}
-          </span>
-          <span class="meta-item">
-            <i class="fas fa-calendar-alt"></i> {{ petition.created_at|date:"d M Y" }}
-          </span>
+      <!-- Progress Bar -->
+      <section class="petition-progress">
+        <div class="progress-container">
+          {% widthratio petition.signatures.count petition.goal|default:10000 100 as percent %}
+          <div class="progress-bar" role="progressbar" style="width: {{ percent }}%;">
+            <span class="progress-text">{{ petition.signatures.count }} firme</span>
+          </div>
         </div>
+        <small class="progress-goal">Obiettivo: {{ petition.goal|default:"10,000" }} firme</small>
+      </section>
 
-        <!-- Actions -->
-        <div class="petition-actions">
-          {% if user.is_authenticated and user == petition.created_by %}
-            <a href="{% url 'petitions:petition_edit' petition.pk %}" class="btn-edit">
-              Edit
-            </a>
-            <a href="{% url 'petitions:petition_delete' petition.pk %}" class="btn-delete">
-              Delete
-            </a>
-          {% endif %}
-          {% comment %} <a href="{% url 'petitions:sign_petition' petition.pk %}" class="btn-sign"> {% endcomment %}
-            Sign Petition
-          </a>
-        </div>
+      <!-- Metadata -->
+      <div class="petition-meta">
+        <span><i class="fas fa-user"></i> Creatore: {{ petition.created_by.username }}</span>
+        <span><i class="fas fa-calendar-alt"></i> Creata il: {{ petition.created_at|date:"d M Y" }}</span>
+      </div>
 
-        <!-- Social Sharing -->
-        <div class="social-sharing">
-          <span>Share:</span>
-          <a href="#" class="social-icon facebook"><i class="fab fa-facebook-f"></i></a>
-          <a href="#" class="social-icon twitter"><i class="fab fa-twitter"></i></a>
-          <a href="#" class="social-icon linkedin"><i class="fab fa-linkedin-in"></i></a>
-        </div>
+      <!-- Azioni -->
+      <div class="petition-actions">
+        {% if user.is_authenticated and user == petition.created_by %}
+          <a href="{% url 'petitions:petition_edit' petition.pk %}" class="btn-edit">Modifica</a>
+          <a href="{% url 'petitions:petition_delete' petition.pk %}" class="btn-delete">Elimina</a>
+        {% endif %}
+
+        <a href="{% url 'petitions:request_signature' petition.pk %}" class="btn-sign">
+          Firma questa petizione
+        </a>
+      </div>
+<section class="comments-section">
+  <h2>Commenti ({{ comments.count }})</h2>
+
+  {% if user.is_authenticated %}
+    <form method="post" action=".">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit" class="btn btn-primary">Aggiungi commento</button>
+    </form>
+  {% else %}
+    <p>Devi <a href="{% url 'login' %}">accedere</a> per scrivere un commento.</p>
+  {% endif %}
+{% comment %} Commenti {% endcomment %}
+  <div class="comments-list">
+    {% for comment in comments %}
+      <div class="comment">
+        <p><strong>{{ comment.user.username }}</strong> - {{ comment.created_at|date:"d M Y H:i" }}</p>
+        <p>{{ comment.content|linebreaksbr }}</p>
+      </div>
+    {% empty %}
+      <p>Nessun commento ancora.</p>
+    {% endfor %}
+  </div>
+</section>
+
+      <!-- Social Sharing -->
+      <div class="social-sharing">
+        <span>Condividi:</span>
+        <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}" class="social-icon facebook" target="_blank"><i class="fab fa-facebook-f"></i></a>
+        <a href="https://twitter.com/intent/tweet?url={{ request.build_absolute_uri }}&text={{ petition.title }}" class="social-icon twitter" target="_blank"><i class="fab fa-twitter"></i></a>
+        <a href="https://www.linkedin.com/shareArticle?mini=true&url={{ request.build_absolute_uri }}" class="social-icon linkedin" target="_blank"><i class="fab fa-linkedin-in"></i></a>
       </div>
     </div>
-  </div>
+    
+  </article>
 </main>
 {% endblock %}

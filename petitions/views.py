@@ -1,13 +1,16 @@
 from django.urls import reverse_lazy
 from django.shortcuts import get_object_or_404, redirect
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, FormView, View
+from django.views.generic.edit import FormMixin
 from django.db.models import Count, Q
-from .models import Petition, PetitionStatus, PetitionCategory, Signature, PendingSignature
-from .forms import PetitionForm, SignatureForm
+from .models import Petition, PetitionStatus, PetitionCategory, Signature, PendingSignature, Comment
+from .forms import PetitionForm, SignatureForm, CommentForm
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.http import HttpResponseForbidden
 from django.contrib import messages
 from django.core.mail import send_mail
+from django.urls import reverse
+
 
 class HomeView(ListView):
     model = Petition
@@ -68,13 +71,35 @@ class PetitionListView(LoginRequiredMixin, ListView):
 
 
 
-class PetitionDetailView(DetailView):
+class PetitionDetailView(FormMixin, DetailView):
     model = Petition
     template_name = 'petitions/petition_detail.html'
     context_object_name = 'petition'
+    form_class = CommentForm
 
     def get_queryset(self):
         return Petition.objects.all()
+
+    def get_success_url(self):
+        return reverse('petitions:petition_detail', kwargs={'pk': self.object.pk})
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form'] = self.get_form()
+        context['comments'] = self.object.comments.select_related('user').order_by('-created_at')
+        return context
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        form = self.get_form()
+        if form.is_valid() and request.user.is_authenticated:
+            comment = form.save(commit=False)
+            comment.petition = self.object
+            comment.user = request.user
+            comment.save()
+            return redirect(self.get_success_url())
+        else:
+            return self.form_invalid(form)
 
 
 class PetitionCreateView(LoginRequiredMixin, CreateView):

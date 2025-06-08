@@ -6,7 +6,7 @@
 {% block page_content %}{% endblock %}
 
 {% block content %}
-<main class="main-content">
+<main>
     <div class="container" style="max-width: 600px; margin: 0 auto;">
         <h2 class="section-title" style="text-align: left; margin-bottom: 1.5rem;">
             {% if form.instance.pk %}Modifica Petizione{% else %}Crea Petizione{% endif %}
@@ -56,6 +56,13 @@
                 <small class="form-hint">Separate i tag con virgole</small>
                 {% if form.tags.errors %}
                     <div class="error-message">{{ form.tags.errors }}</div>
+                {% endif %}
+            </div>
+            <div class="form-group">
+                {{ form.location.label_tag }}
+                {{ form.location }}
+                {% if form.location.errors %}
+                    <div class="error-message">{{ form.location.errors }}</div>
                 {% endif %}
             </div>
 

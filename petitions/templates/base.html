@@ -13,36 +13,44 @@
     {% block extra_head %}{% endblock %}
 </head>
 <body>
-    <!-- Header/Navbar -->
+<!-- Header/Navbar -->
+
     {% include "partials/nav_petition.html" %}
 
-    <!-- Hero Section -->
+<!-- Hero Section -->
+
     {% block page_content %}
         {% include "partials/banner_petiton.html" %}
+
     {% endblock %}
-<section class="global-search">
-    <div class="container">
-        <form action="{% url 'petitions:petition_search' %}" method="get" class="search-form">
-            <input type="text" name="q" placeholder="Cerca una petizione..." required>
-            <button type="submit"><i class="fas fa-search"></i></button>
-        </form>
-    </div>
-</section>
-    <!-- Main Content -->
-    <main class="main-content">
+
+
+
+<!-- Global Search -->
+    {% block global_search %}
+
+        {% include 'partials/global_search.html' %}
+    {% endblock %}
+
+<!-- Main Content -->
+
+    <main>
+
         <div class="container">
             {% block content %}
-            <!-- Il contenuto specifico di ogni pagina verrà inserito qui -->
             {% endblock %}
         </div>
 
-        <!-- Aggiungi questo nel tuo template dove vuoi mostrare le petizioni -->
     {% include "partials/slider.html" %}
 
     </main>
 
-    <!-- Footer -->
+
+
+<!-- Footer -->
     {% include 'partials/footer_petition.html' %}
+
+
 
     <script src="{% static 'javascript/home.js' %}"></script>
 </body>

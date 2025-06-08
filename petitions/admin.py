@@ -79,3 +79,8 @@ class AuditLogAdmin(admin.ModelAdmin):
     search_fields = ('user__username', 'action', 'ip_address')
     list_filter = ('timestamp',)
 
+@admin.register(Comment)
+class CommentAdmin(admin.ModelAdmin):
+    list_display = ('petition', 'user', 'created_at')
+    list_filter = ('created_at',)
+    search_fields = ('content', 'user__username', 'petition__title')
