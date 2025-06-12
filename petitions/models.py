@@ -78,15 +78,19 @@ class Comment(models.Model):
 #VOTO
 class PetitionVote(models.Model):
     petition = models.ForeignKey(Petition, on_delete=models.CASCADE, related_name='votes')
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True)
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
     is_upvote = models.BooleanField(default=True)
     voted_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        unique_together = ('petition', 'user')
+        unique_together = ('petition', 'user', 'ip_address')
 
     def __str__(self):
-        return f"{self.user.username} voted {'↑' if self.is_upvote else '↓'} on '{self.petition.title}'"
+        if self.user:
+            return f"{self.user.username} voted {'↑' if self.is_upvote else '↓'}"
+        return f"Anonymous ({self.ip_address}) voted {'↑' if self.is_upvote else '↓'}"
+
 
 #ALLEGATO
 class PetitionAttachment(models.Model):

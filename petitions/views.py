@@ -3,13 +3,14 @@ from django.shortcuts import get_object_or_404, redirect
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, FormView, View
 from django.views.generic.edit import FormMixin
 from django.db.models import Count, Q
-from .models import Petition, PetitionStatus, PetitionCategory, Signature, PendingSignature, Comment
+from .models import Petition, PetitionStatus, PetitionCategory, Signature, PendingSignature, Comment, PetitionVote
 from .forms import PetitionForm, SignatureForm, CommentForm
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.http import HttpResponseForbidden
 from django.contrib import messages
 from django.core.mail import send_mail
 from django.urls import reverse
+from .utils import get_client_ip
 
 
 class HomeView(ListView):
@@ -214,7 +215,7 @@ class ConfirmSignatureView(View):
             pending = PendingSignature.objects.get(token=token, confirmed=False)
         except PendingSignature.DoesNotExist:
             messages.error(request, "Link non valido o firma già confermata.")
-            return redirect('petitions:home')  # o 'home' se è fuori dal namespace
+            return redirect('petitions:home')
 
         Signature.objects.create(petition=pending.petition, email=pending.email)
         pending.confirmed = True
@@ -222,3 +223,42 @@ class ConfirmSignatureView(View):
 
         messages.success(request, "La tua firma è stata confermata!")
         return redirect('petitions:petition_detail', pk=pending.petition.pk)
+
+
+from django.views import View
+from django.shortcuts import get_object_or_404, redirect
+from .models import Petition, PetitionVote
+
+class PetitionVoteView(View):
+    def post(self, request, pk):
+        petition = get_object_or_404(Petition, pk=pk)
+        is_upvote = request.POST.get('vote') == 'up'
+        ip = get_client_ip(request)
+
+        user = request.user if request.user.is_authenticated else None
+
+        vote_filter = {'petition': petition}
+        if user:
+            vote_filter['user'] = user
+            vote_filter['ip_address__isnull'] = True
+        else:
+            vote_filter['user__isnull'] = True
+            vote_filter['ip_address'] = ip
+
+        vote = PetitionVote.objects.filter(**vote_filter).first()
+
+        if vote:
+            if vote.is_upvote != is_upvote:
+                vote.is_upvote = is_upvote
+                vote.save()
+            else:
+                vote.delete()
+        else:
+            PetitionVote.objects.create(
+                petition=petition,
+                user=user,
+                ip_address=None if user else ip,
+                is_upvote=is_upvote,
+            )
+
+        return redirect('petitions:petition_detail', pk=pk)

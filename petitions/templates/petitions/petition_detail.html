@@ -15,10 +15,10 @@
 
     <!-- Petition Image -->
     <div class="petition-image">
-      {% if petition.attachments.first %}
-        <img src="{{ petition.attachments.first.file.url }}" 
-             alt="{{ petition.title }}" 
-             onerror="this.src='{% static 'images/sample-petition.jpg' %}'">
+      {% if petition.image %}
+        <img src="{{ petition.image.url }}" 
+            alt="{{ petition.title }}" 
+            onerror="this.src='{% static 'images/sample-petition.jpg' %}'">
       {% else %}
         <img src="{% static 'images/sample-petition.jpg' %}" alt="Default petition image">
       {% endif %}
@@ -63,6 +63,35 @@
           Firma questa petizione
         </a>
       </div>
+      <div class="petition-votes">
+  <h3>Vota questa petizione</h3>
+
+  <form method="post" action="{% url 'petitions:petition_vote' petition.pk %}">
+    {% csrf_token %}
+    <button type="submit" name="vote" value="up" class="btn-vote upvote">
+      👍 {{ petition.upvotes }}
+    </button>
+    <button type="submit" name="vote" value="down" class="btn-vote downvote">
+      👎 {{ petition.downvotes }}
+    </button>
+  </form>
+
+  <p class="vote-score">
+    Voto complessivo: <strong>{{ petition.vote_score }}</strong>
+  </p>
+
+  {% if user_vote %}
+    <p class="user-vote-status">
+      Hai votato: 
+      {% if user_vote.is_upvote %}
+        <span class="voted-up">👍 positivo</span>
+      {% else %}
+        <span class="voted-down">👎 negativo</span>
+      {% endif %}
+    </p>
+  {% endif %}
+</div>
+
 <section class="comments-section">
   <h2>Commenti ({{ comments.count }})</h2>
 
@@ -73,7 +102,7 @@
       <button type="submit" class="btn btn-primary">Aggiungi commento</button>
     </form>
   {% else %}
-    <p>Devi <a href="{% url 'login' %}">accedere</a> per scrivere un commento.</p>
+    <p>Devi <a href="">accedere</a> per scrivere un commento.</p>
   {% endif %}
 {% comment %} Commenti {% endcomment %}
   <div class="comments-list">

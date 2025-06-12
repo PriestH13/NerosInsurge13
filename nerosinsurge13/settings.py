@@ -26,6 +26,7 @@ INSTALLED_APPS = [
     'petitions',
     'auth_users',
     "widget_tweaks",
+    'rest_framework',
 ]
 
 MIDDLEWARE = [

@@ -23,4 +23,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('petitions/', include('petitions.urls')),
     path('', include('auth_users.urls')),
+    path('api/', include('petitions.api_urls')),
+
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
