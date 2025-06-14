@@ -1,0 +1,12 @@
+
+{% block content %}
+<div class="container mt-5">
+  <h2>Segnala Petizione</h2>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-danger">Invia segnalazione</button>
+<a href="{% url 'petitions:petition_detail' petition.pk %}" class="btn btn-secondary">Annulla</a>
+  </form>
+</div>
+{% endblock %}

@@ -9,7 +9,9 @@ from .views import (
     RequestSignatureView,
     ConfirmSignatureView,
     PetitionSearchView,
-    PetitionVoteView
+    PetitionVoteView,
+    ReportPetitionView,
+    
 )
 
 app_name = 'petitions'
@@ -30,4 +32,6 @@ urlpatterns = [
     path('firma/conferma/<uuid:token>/', ConfirmSignatureView.as_view(), name='confirm_signature'),
     
     path('<int:pk>/vote/', PetitionVoteView.as_view(), name='petition_vote'),
+
+    path('report/petition/<int:pk>/', ReportPetitionView.as_view(), name='report_petition'),
 ]

@@ -47,9 +47,13 @@ class PetitionAttachmentAdmin(admin.ModelAdmin):
 
 @admin.register(Report)
 class ReportAdmin(admin.ModelAdmin):
-    list_display = ('reported_by', 'petition', 'comment', 'created_at')
-    search_fields = ('reported_by__username', 'petition__title', 'comment__content')
+    list_display = ('reported_by', 'get_target', 'reason', 'created_at')
     list_filter = ('created_at',)
+    search_fields = ('reason', 'reported_by__username')
+
+    def get_target(self, obj):
+        return obj.petition or obj.comment
+    get_target.short_description = 'Oggetto Segnalato'
 
 
 @admin.register(Notification)

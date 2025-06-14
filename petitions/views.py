@@ -4,7 +4,7 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, D
 from django.views.generic.edit import FormMixin
 from django.db.models import Count, Q
 from .models import Petition, PetitionStatus, PetitionCategory, Signature, PendingSignature, Comment, PetitionVote
-from .forms import PetitionForm, SignatureForm, CommentForm
+from .forms import PetitionForm, SignatureForm, CommentForm, ReportForm
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.http import HttpResponseForbidden
 from django.contrib import messages
@@ -225,10 +225,6 @@ class ConfirmSignatureView(View):
         return redirect('petitions:petition_detail', pk=pending.petition.pk)
 
 
-from django.views import View
-from django.shortcuts import get_object_or_404, redirect
-from .models import Petition, PetitionVote
-
 class PetitionVoteView(View):
     def post(self, request, pk):
         petition = get_object_or_404(Petition, pk=pk)
@@ -262,3 +258,24 @@ class PetitionVoteView(View):
             )
 
         return redirect('petitions:petition_detail', pk=pk)
+
+
+class ReportPetitionView(LoginRequiredMixin, FormView):
+    form_class = ReportForm
+    template_name = 'reports/report_form.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        self.petition = get_object_or_404(Petition, pk=kwargs['pk'])
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['petition'] = self.petition
+        return context
+
+    def form_valid(self, form):
+        report = form.save(commit=False)
+        report.reported_by = self.request.user
+        report.petition = self.petition
+        report.save()
+        return redirect('petitions:petition_detail', pk=self.petition.pk)
