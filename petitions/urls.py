@@ -1,10 +1,6 @@
 from django.urls import path
 from .views import (HomeView,PetitionListView,PetitionDetailView,PetitionCreateView,PetitionUpdateView,PetitionDeleteView,RequestSignatureView,ConfirmSignatureView,
-    PetitionSearchView,
-    PetitionVoteView,
-    ReportPetitionView,
-    NotificationListView,
-    
+    PetitionSearchView,PetitionVoteView,ReportPetitionView,NotificationListView,AboutView, TermsView, PrivacyView
 )
 
 app_name = 'petitions'
@@ -29,5 +25,13 @@ urlpatterns = [
     path('report/petition/<int:pk>/', ReportPetitionView.as_view(), name='report_petition'),
 
     path('notifications/', NotificationListView.as_view(), name='notification_list'),
+    # other
+    path('other/chi-siamo/', AboutView.as_view(), name='about'),
+    path('other/termini-e-condizioni/', TermsView.as_view(), name='terms'),
+    path('other/privacy/', PrivacyView.as_view(), name='privacy'),
+
+
+
+
 
 ]

@@ -1,6 +1,6 @@
 from django.urls import reverse_lazy
 from django.shortcuts import get_object_or_404, redirect
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, FormView, View
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, FormView, View, TemplateView
 from django.views.generic.edit import FormMixin
 from django.db.models import Count, Q
 from .models import Petition, PetitionStatus, PetitionCategory, Signature, PendingSignature, Comment, PetitionVote, Notification
@@ -35,6 +35,14 @@ class HomeView(ListView):
 
         return context
 
+class AboutView(TemplateView):
+    template_name = "other/about.html"
+
+class TermsView(TemplateView):
+    template_name = "other/terms.html"
+
+class PrivacyView(TemplateView):
+    template_name = "other/privacy.html"
 
 
 class PetitionListView(LoginRequiredMixin, ListView):
