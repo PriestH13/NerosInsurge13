@@ -3,14 +3,16 @@ from django.shortcuts import get_object_or_404, redirect
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, FormView, View
 from django.views.generic.edit import FormMixin
 from django.db.models import Count, Q
-from .models import Petition, PetitionStatus, PetitionCategory, Signature, PendingSignature, Comment, PetitionVote
+from .models import Petition, PetitionStatus, PetitionCategory, Signature, PendingSignature, Comment, PetitionVote, Notification
 from .forms import PetitionForm, SignatureForm, CommentForm, ReportForm
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.http import HttpResponseForbidden
+from django.http import HttpResponseForbidden, JsonResponse
 from django.contrib import messages
 from django.core.mail import send_mail
 from django.urls import reverse
 from .utils import get_client_ip
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
 
 
 class HomeView(ListView):
@@ -43,7 +45,6 @@ class PetitionListView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         qs = Petition.objects.filter(status=PetitionStatus.PUBLISHED, is_active=True)
-        # Se non sei admin, vedi solo le tue petizioni
         if not self.request.user.is_superuser:
             qs = qs.filter(created_by=self.request.user)
 
@@ -126,15 +127,12 @@ class PetitionUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
     def test_func(self):
         petition = self.get_object()
-        # Controlla se è admin o autore della petizione
         return self.request.user.is_superuser or petition.created_by == self.request.user
 
     def handle_no_permission(self):
-        # Se l'utente non ha permessi, restituisci 403
         if self.request.user.is_authenticated:
             return HttpResponseForbidden("Non hai i permessi per modificare questa petizione.")
         else:
-            # Se non è autenticato, usa il comportamento standard (redirect login)
             return super().handle_no_permission()
 
     def get_success_url(self):
@@ -207,6 +205,20 @@ class RequestSignatureView(FormView):
             )
             messages.success(self.request, "Ti abbiamo inviato un'email per confermare la firma.")
         return redirect('petitions:petition_detail', pk=petition.pk)
+    
+
+    def form_valid(self, form):
+        signature = form.save(commit=False)
+        signature.user = self.request.user
+        signature.petition = self.petition
+        signature.save()
+
+        Notification.objects.create(
+            user=self.petition.created_by,
+            message=f"{self.request.user.username} ha firmato la tua petizione '{self.petition.title}'.",
+            link=f"/petitions/{self.petition.pk}/"
+        )
+        return redirect('petitions:petition_detail', pk=self.petition.pk)
 
 
 class ConfirmSignatureView(View):
@@ -279,3 +291,29 @@ class ReportPetitionView(LoginRequiredMixin, FormView):
         report.petition = self.petition
         report.save()
         return redirect('petitions:petition_detail', pk=self.petition.pk)
+
+
+class NotificationListView(LoginRequiredMixin, ListView):
+    model = Notification
+    template_name = 'notification/notification_list.html'
+    context_object_name = 'notifications'
+
+    def get_queryset(self):
+        return self.request.user.notifications.order_by('-created_at')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['unread_notifications_count'] = self.request.user.notifications.filter(is_read=False).count()
+        return context
+    
+
+@require_POST
+@login_required
+def mark_notification_read(request, pk):
+    try:
+        notif = Notification.objects.get(pk=pk, user=request.user)
+        notif.is_read = True
+        notif.save()
+        return JsonResponse({'status': 'ok'})
+    except Notification.DoesNotExist:
+        return JsonResponse({'status': 'not_found'}, status=404)

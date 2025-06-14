@@ -24,8 +24,12 @@
                 <a href="{% url 'admin:index' %}">Admin Dashboard</a>
             {% endif %}
 
-            <a href="">Impostazioni Account</a>
-            <a href="{% url 'auth:password_change' %}">Cambia Password</a>
+<a href="{% url 'petitions:notification_list' %}">
+    Notifiche
+    {% if unread_notifications_count > 0 %}
+        <span class="badge">{{ unread_notifications_count }}</span>
+    {% endif %}
+</a>
 
             <a href="">FAQ</a>
             <a href="">Contattaci</a>

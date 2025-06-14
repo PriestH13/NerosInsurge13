@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{%load static%}
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/notification.css' %}">
+<script src="{% static 'javascripts/notification.js' %}" defer></script>
+{% endblock %}
+{% block content %}
+<ul id="notifications-list">
+  {% for notif in notifications %}
+    <li
+      class="notification-item {% if not notif.is_read %}unread{% endif %}"
+      data-id="{{ notif.id }}"
+      style="font-weight: {% if not notif.is_read %}bold{% else %}normal{% endif %}; margin-bottom: 10px;"
+    >
+      {% if notif.link %}
+        <a href="{{ notif.link }}" target="_blank">{{ notif.message }}</a>
+      {% else %}
+        {{ notif.message }}
+      {% endif %}
+      <br><small>{{ notif.created_at|date:"d M Y H:i" }}</small>
+    </li>
+  {% empty %}
+    <li>Non hai notifiche.</li>
+  {% endfor %}
+</ul>
+
+{% endblock %}
