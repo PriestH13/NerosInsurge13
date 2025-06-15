@@ -3,7 +3,7 @@ from django.shortcuts import get_object_or_404, redirect
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, FormView, View, TemplateView
 from django.views.generic.edit import FormMixin
 from django.db.models import Count, Q
-from .models import Petition, PetitionStatus, PetitionCategory, Signature, PendingSignature, Comment, PetitionVote, Notification
+from .models import Petition, PetitionStatus, PetitionCategory, Signature, PendingSignature, Comment, PetitionVote, Notification, PetitionView
 from .forms import PetitionForm, SignatureForm, CommentForm, ReportForm
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.http import HttpResponseForbidden, JsonResponse
@@ -87,6 +87,20 @@ class PetitionDetailView(FormMixin, DetailView):
     context_object_name = 'petition'
     form_class = CommentForm
 
+    def get(self, request, *args, **kwargs):
+        response = super().get(request, *args, **kwargs)
+        petition = self.get_object()
+
+        user = request.user if request.user.is_authenticated else None
+        ip = get_client_ip(request)
+
+        if user:
+            PetitionView.objects.get_or_create(petition=petition, user=user)
+        else:
+            PetitionView.objects.get_or_create(petition=petition, user=None, ip_address=ip)
+
+        return response
+
     def get_queryset(self):
         return Petition.objects.all()
 
@@ -97,6 +111,9 @@ class PetitionDetailView(FormMixin, DetailView):
         context = super().get_context_data(**kwargs)
         context['form'] = self.get_form()
         context['comments'] = self.object.comments.select_related('user').order_by('-created_at')
+        context['view_count'] = self.object.views.count()
+        context['user_views'] = self.object.views.filter(user__isnull=False).count()
+        context['anonymous_views'] = self.object.views.filter(user__isnull=True).count()
         return context
 
     def post(self, request, *args, **kwargs):
@@ -110,7 +127,6 @@ class PetitionDetailView(FormMixin, DetailView):
             return redirect(self.get_success_url())
         else:
             return self.form_invalid(form)
-
 
 class PetitionCreateView(LoginRequiredMixin, CreateView):
     model = Petition
