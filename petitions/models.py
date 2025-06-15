@@ -138,14 +138,21 @@ class PetitionView(models.Model):
 
 #MODERAZIONE
 class ModerationAction(models.Model):
+    class ActionType(models.TextChoices):
+        APPROVE = 'APPROVE', 'Approvata'
+        REJECT = 'REJECT', 'Rifiutata'
+        DELETE = 'DELETE', 'Cancellata'
+        FLAG = 'FLAG', 'Segnalata'
+        ARCHIVE = 'ARCHIVE', 'Archiviata'
+
     moderator = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
     petition = models.ForeignKey(Petition, on_delete=models.CASCADE)
-    action = models.CharField(max_length=100)
+    action = models.CharField(max_length=20, choices=ActionType.choices)
     reason = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.moderator} -> {self.action} on '{self.petition.title}'"
+        return f"{self.moderator} -> {self.get_action_display()} on '{self.petition.title}'"
 
 #AUDIT LOG
 class AuditLog(models.Model):

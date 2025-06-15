@@ -1,5 +1,5 @@
 from django import forms
-from .models import Petition, PetitionCategory, Tag, Signature, Report
+from .models import Petition, PetitionCategory, Tag, Signature, Report, ModerationAction
 
 class PetitionForm(forms.ModelForm):
     class Meta:
@@ -44,3 +44,9 @@ class ReportForm(forms.ModelForm):
         fields = ['reason']
         widgets = {
             'reason': forms.Textarea(attrs={'rows': 4, 'placeholder': 'Spiega il motivo della segnalazione...'}),}
+        
+
+class ModerationActionForm(forms.ModelForm):
+    class Meta:
+        model = ModerationAction
+        fields = ['petition', 'action', 'reason']

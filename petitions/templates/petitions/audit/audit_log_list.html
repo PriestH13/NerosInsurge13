@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h1>Audit Log</h1>
+
+  {% if audit_logs %}
+    <table>
+      <thead>
+        <tr>
+          <th>Utente</th>
+          <th>Azione</th>
+          <th>Data e Ora</th>
+          <th>Indirizzo IP</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for log in audit_logs %}
+          <tr>
+            <td>{{ log.user }}</td>
+            <td>{{ log.action }}</td>
+            <td>{{ log.timestamp|date:"d/m/Y H:i:s" }}</td>
+            <td>{{ log.ip_address|default:"-" }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    {% if is_paginated %}
+      <div class="pagination">
+        {% if page_obj.has_previous %}
+          <a href="?page={{ page_obj.previous_page_number }}">Prev</a>
+        {% endif %}
+
+        <span>Pagina {{ page_obj.number }} di {{ page_obj.paginator.num_pages }}</span>
+
+        {% if page_obj.has_next %}
+          <a href="?page={{ page_obj.next_page_number }}">Next</a>
+        {% endif %}
+      </div>
+    {% endif %}
+
+  {% else %}
+    <p>Nessun evento di audit registrato.</p>
+  {% endif %}
+{% endblock %}

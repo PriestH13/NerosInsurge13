@@ -121,6 +121,7 @@
 </section>
 
 
+
       <!-- Social Sharing -->
       <div class="social-sharing">
         <span>Condividi:</span>
@@ -131,7 +132,15 @@
     </div>
     
   </article>
+{% if user.is_authenticated %}
+  <div class="report-link">
+    <a href="{% url 'petitions:report_petition' petition.pk %}" class="btn btn-warning">
+      🚨 Segnala questa petizione
+    </a>
+  </div>
+{% else %}
+  <p><a href="{% url 'login' %}?next={{ request.path }}">Accedi</a> per segnalare questa petizione.</p>
+{% endif %}
 
-      {% include 'reports/report_form.html' %}
 </main>
 {% endblock %}

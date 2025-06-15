@@ -3,8 +3,8 @@ from django.shortcuts import get_object_or_404, redirect
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, FormView, View, TemplateView
 from django.views.generic.edit import FormMixin
 from django.db.models import Count, Q
-from .models import Petition, PetitionStatus, PetitionCategory, Signature, PendingSignature, Comment, PetitionVote, Notification, PetitionView
-from .forms import PetitionForm, SignatureForm, CommentForm, ReportForm
+from .models import Petition, PetitionStatus, PetitionCategory, Signature, PendingSignature, Comment, PetitionVote, Notification, PetitionView, ModerationAction
+from .forms import PetitionForm, SignatureForm, CommentForm, ReportForm, ModerationActionForm
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.http import HttpResponseForbidden, JsonResponse
 from django.contrib import messages
@@ -13,7 +13,9 @@ from django.urls import reverse
 from .utils import get_client_ip
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
-
+from django.contrib.admin.views.decorators import staff_member_required
+from django.utils.decorators import method_decorator
+from .utils import log_action
 
 class HomeView(ListView):
     model = Petition
@@ -135,10 +137,13 @@ class PetitionCreateView(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.created_by = self.request.user
-        return super().form_valid(form)
+        response = super().form_valid(form)
+        log_action(self.request.user, f"Created petition: {form.instance.title}", self.request)
+        return response
 
     def get_success_url(self):
         return reverse_lazy('petitions:petition_detail', kwargs={'pk': self.object.pk})
+
 
 
 
@@ -341,3 +346,17 @@ def mark_notification_read(request, pk):
         return JsonResponse({'status': 'ok'})
     except Notification.DoesNotExist:
         return JsonResponse({'status': 'not_found'}, status=404)
+    
+
+@method_decorator(staff_member_required, name='dispatch')
+class ModerationActionCreateView(CreateView):
+    model = ModerationAction
+    form_class = ModerationActionForm
+    template_name = 'moderation/moderation_form.html'
+
+    def form_valid(self, form):
+        form.instance.moderator = self.request.user
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse('petitions:petition_detail', kwargs={'pk': self.object.petition.pk})

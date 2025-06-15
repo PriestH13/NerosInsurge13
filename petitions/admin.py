@@ -72,9 +72,9 @@ class PetitionViewAdmin(admin.ModelAdmin):
 
 @admin.register(ModerationAction)
 class ModerationActionAdmin(admin.ModelAdmin):
-    list_display = ('moderator', 'petition', 'action', 'created_at')
-    search_fields = ('moderator__username', 'petition__title', 'action')
-    list_filter = ('created_at',)
+    list_display = ['moderator', 'petition', 'action', 'created_at']
+    list_filter = ['action', 'created_at']
+    search_fields = ['petition__title', 'moderator__username', 'reason']
 
 
 @admin.register(AuditLog)
