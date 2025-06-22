@@ -2,6 +2,9 @@
 {% load static %}
 {% block extra_head %}
 <link rel="stylesheet" href="{% static 'css/create.css' %}">
+<script src="{% static 'javascripts/create.js' %}" defer></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
 {% endblock %}
 {% block page_content %}{% endblock %}
 
@@ -32,39 +35,74 @@
                 {% endif %}
             </div>
 
-            <div class="form-row">
-                <div class="form-group">
-                    {{ form.category.label_tag }}
-                    {{ form.category }}
-                    {% if form.category.errors %}
-                        <div class="error-message">{{ form.category.errors }}</div>
-                    {% endif %}
-                </div>
+<div class="form-row">
+  <div class="form-group" style="position: relative;">
+    <label for="category-search">Categoria</label>
+    <input
+      type="text"
+      id="category-search"
+      name="category_search"
+      autocomplete="off"
+      placeholder="Cerca categoria..."
+      aria-autocomplete="list"
+      aria-controls="category-suggestions"
+      aria-expanded="false"
+      aria-haspopup="listbox"
+      role="combobox"
+    />
+    <ul id="category-suggestions" class="autocomplete-suggestions" role="listbox" tabindex="-1"></ul>
 
-                <div class="form-group">
-                    {{ form.status.label_tag }}
-                    {{ form.status }}
-                    {% if form.status.errors %}
-                        <div class="error-message">{{ form.status.errors }}</div>
-                    {% endif %}
-                </div>
-            </div>
+    {% if form.category.errors %}
+      <div class="error-message">{{ form.category.errors }}</div>
+    {% endif %}
 
-            <div class="form-group">
-                {{ form.tags.label_tag }}
-                {{ form.tags }}
-                <small class="form-hint">Separate i tag con virgole</small>
-                {% if form.tags.errors %}
-                    <div class="error-message">{{ form.tags.errors }}</div>
-                {% endif %}
-            </div>
-            <div class="form-group">
-                {{ form.location.label_tag }}
-                {{ form.location }}
-                {% if form.location.errors %}
-                    <div class="error-message">{{ form.location.errors }}</div>
-                {% endif %}
-            </div>
+    <!-- Select originale, nascosto ma attivo -->
+    {{ form.category }}
+  </div>
+
+  <div class="form-group">
+    {{ form.status.label_tag }}
+    {{ form.status }}
+    {% if form.status.errors %}
+      <div class="error-message">{{ form.status.errors }}</div>
+    {% endif %}
+  </div>
+</div>
+
+
+
+<div class="form-group" style="position: relative;">
+    {{ form.tags.label_tag }}
+    <input
+      type="text"
+      id="tags-input"
+      name="tags_input"
+      placeholder="Scrivi tag separati da virgole..."
+      autocomplete="off"
+      aria-autocomplete="list"
+      aria-controls="tags-suggestions"
+      aria-expanded="false"
+      aria-haspopup="listbox"
+      role="combobox"
+    />
+    <ul id="tags-suggestions" class="autocomplete-suggestions" role="listbox" tabindex="-1"></ul>
+
+    <small class="form-hint">Separate i tag con virgole</small>
+
+    {% if form.tags.errors %}
+        <div class="error-message">{{ form.tags.errors }}</div>
+    {% endif %}
+</div>
+
+<div class="form-group">
+    {{ form.location.label_tag }}
+    <input type="text" id="location" name="location" value="{{ form.location.value|default_if_none:'' }}" class="form-control" placeholder="Cerca un luogo...">
+    <ul id="location-suggestions" class="autocomplete-suggestions"></ul>
+    {% if form.location.errors %}
+        <div class="error-message">{{ form.location.errors }}</div>
+    {% endif %}
+</div>
+
 
             <div class="form-group">
                 {{ form.image.label_tag }}
@@ -98,6 +136,7 @@
         </form>
     </div>
 </main>
-
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
 
 {% endblock %}
