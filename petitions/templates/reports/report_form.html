@@ -1,12 +1,28 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/report.css' %}">
+<link rel="stylesheet" href="{% static 'css/petition_detail.css' %}">
+<script src="{% static 'js/register.js' %}" defer></script>
+{% endblock %}
+{% block title %}Ricerca Petizioni{% endblock %}
+{% block page_content %}{% endblock %}
+{% block global_search %}{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-  <h2>Segnala Petizione</h2>
-  <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="btn btn-danger">Invia segnalazione</button>
-<a href="{% url 'petitions:petition_detail' petition.pk %}" class="btn btn-secondary">Annulla</a>
-  </form>
+<div class="report-container">
+  <div class="report-form-card">
+    <h2 class="report-title">Segnala Petizione</h2>
+    
+    <form method="post" class="report-form">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <div class="report-form-buttons">
+        <button type="submit" class="btn-report-submit">Invia segnalazione</button>
+        <a href="{% url 'petitions:petition_detail' petition.pk %}" class="btn-report-cancel">Annulla</a>
+      </div>
+    </form>
+  </div>
 </div>
 {% endblock %}

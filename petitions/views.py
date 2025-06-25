@@ -3,7 +3,7 @@ from django.shortcuts import get_object_or_404, redirect
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, FormView, View, TemplateView
 from django.views.generic.edit import FormMixin
 from django.db.models import Count, Q
-from .models import Petition, PetitionStatus, PetitionCategory, Signature, PendingSignature, Comment, PetitionVote, Notification, PetitionView, ModerationAction
+from .models import Petition, PetitionStatus, PetitionCategory, Signature, PendingSignature, PetitionVote, Notification, PetitionView, ModerationAction
 from .forms import PetitionForm, SignatureForm, CommentForm, ReportForm, ModerationActionForm
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.http import HttpResponseForbidden, JsonResponse
@@ -16,6 +16,8 @@ from django.views.decorators.http import require_POST
 from django.contrib.admin.views.decorators import staff_member_required
 from django.utils.decorators import method_decorator
 from .utils import log_action
+from django.db.models import Count
+
 
 class HomeView(ListView):
     model = Petition
@@ -30,12 +32,15 @@ class HomeView(ListView):
         context = super().get_context_data(**kwargs)
         context['categories'] = PetitionCategory.objects.all()
 
+        # Petizioni secondo nr firme
         context['featured_petitions'] = Petition.objects.filter(
             status=PetitionStatus.PUBLISHED,
             is_active=True
-        ).order_by('-created_at')[:5]
+        ).annotate(num_signatures=Count('signatures')).order_by('-num_signatures')[:5]
 
         return context
+
+
 
 class AboutView(TemplateView):
     template_name = "other/about.html"
@@ -202,6 +207,7 @@ class PetitionSearchView(ListView):
         context['categories'] = PetitionCategory.objects.all()
         return context
 
+
 class RequestSignatureView(FormView):
     form_class = SignatureForm
     template_name = 'petitions/request_signature.html'
@@ -219,35 +225,41 @@ class RequestSignatureView(FormView):
         email = form.cleaned_data['email']
         petition = self.petition
 
-        if Signature.objects.filter(petition=petition, email=email).exists():
+        # Blocco  2 mail
+        already_signed = Signature.objects.filter(petition=petition, email=email).exists()
+        already_pending = PendingSignature.objects.filter(petition=petition, email=email, confirmed=False).exists()
+
+        if already_signed:
             messages.info(self.request, "Hai già firmato questa petizione con questa email.")
+        elif already_pending:
+            messages.info(self.request, "Hai già richiesto di firmare questa petizione. Controlla la tua email.")
         else:
-            pending = PendingSignature.objects.create(petition=petition, email=email)
-            confirm_url = self.request.build_absolute_uri(
-                reverse('petitions:confirm_signature', kwargs={'token': pending.token})
-            )
-            send_mail(
-                subject='Conferma la tua firma',
-                message=f'Clicca per confermare la firma:\n{confirm_url}',
-                from_email='noreply@tuosito.it',
-                recipient_list=[email],
-            )
-            messages.success(self.request, "Ti abbiamo inviato un'email per confermare la firma.")
+            if self.request.user.is_authenticated:
+                Signature.objects.create(
+                    petition=petition,
+                    email=email
+                )
+                Notification.objects.create(
+                    user=petition.created_by,
+                    message=f"{self.request.user.username} ha firmato la tua petizione '{petition.title}'.",
+                    link=reverse('petitions:petition_detail', kwargs={'pk': petition.pk})
+                )
+                messages.success(self.request, "Hai firmato con successo questa petizione.")
+            else:
+                pending = PendingSignature.objects.create(petition=petition, email=email)
+                confirm_url = self.request.build_absolute_uri(
+                    reverse('petitions:confirm_signature', kwargs={'token': pending.token})
+                )
+                send_mail(
+                    subject='Conferma la tua firma',
+                    message=f'Clicca per confermare la firma:\n{confirm_url}',
+                    from_email='noreply@nerosinsurge13.it',
+                    recipient_list=[email],
+                )
+                messages.success(self.request, "Ti abbiamo inviato un'email per confermare la firma.")
+
         return redirect('petitions:petition_detail', pk=petition.pk)
-    
 
-    def form_valid(self, form):
-        signature = form.save(commit=False)
-        signature.user = self.request.user
-        signature.petition = self.petition
-        signature.save()
-
-        Notification.objects.create(
-            user=self.petition.created_by,
-            message=f"{self.request.user.username} ha firmato la tua petizione '{self.petition.title}'.",
-            link=f"/petitions/{self.petition.pk}/"
-        )
-        return redirect('petitions:petition_detail', pk=self.petition.pk)
 
 
 class ConfirmSignatureView(View):

@@ -251,3 +251,44 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 150);
   });
 });
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    const wrapper = document.getElementById('petitionsWrapper');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const cardWidth = 320; // Larghezza di una card (inclusi margini, adattala)
+    let scrollAmount = 0;
+
+    // Abilita/disabilita i pulsanti in base al contenuto
+    function updateButtons() {
+        prevBtn.disabled = scrollAmount <= 0;
+        nextBtn.disabled = scrollAmount >= wrapper.scrollWidth - wrapper.clientWidth;
+    }
+
+    // Scorri a destra
+    nextBtn.addEventListener('click', () => {
+        scrollAmount += cardWidth;
+        if (scrollAmount > wrapper.scrollWidth - wrapper.clientWidth) {
+            scrollAmount = wrapper.scrollWidth - wrapper.clientWidth;
+        }
+        wrapper.scrollTo({ left: scrollAmount, behavior: 'smooth' });
+        updateButtons();
+    });
+
+    // Scorri a sinistra
+    prevBtn.addEventListener('click', () => {
+        scrollAmount -= cardWidth;
+        if (scrollAmount < 0) {
+            scrollAmount = 0;
+        }
+        wrapper.scrollTo({ left: scrollAmount, behavior: 'smooth' });
+        updateButtons();
+    });
+
+    // Inizializza lo stato dei pulsanti
+    updateButtons();
+
+    // Aggiorna i pulsanti quando la finestra viene ridimensionata
+    window.addEventListener('resize', updateButtons);
+});

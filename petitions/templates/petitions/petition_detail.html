@@ -139,7 +139,7 @@
     </a>
   </div>
 {% else %}
-  <p><a href="{% url 'login' %}?next={{ request.path }}">Accedi</a> per segnalare questa petizione.</p>
+  <p><a href="?next={{ request.path }}">Accedi</a> per segnalare questa petizione.</p>
 {% endif %}
 
 </main>

@@ -129,6 +129,8 @@ class PetitionView(models.Model):
     petition = models.ForeignKey(Petition, on_delete=models.CASCADE, related_name='views')
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True)
     viewed_at = models.DateTimeField(auto_now_add=True)
+    ip_address = models.GenericIPAddressField(null=True, blank=True)  # <--- AGGIUNTO
+
 
     class Meta:
         unique_together = ('petition', 'user')

@@ -1247,3 +1247,481 @@ select[name="category"] {
   clip: rect(0 0 0 0) !important;
   border: 0 !important;
 }
+
+/* Detail Petition CSS */
+
+
+/* Petition Detail Container */
+.petition-detail-container {
+    max-width: var(--max-width);
+    margin: var(--header-height) auto 3rem;
+    padding: 0 1rem;
+    color: var(--light);
+    font-size: 1rem;
+}
+
+/* Petition Card */
+.petition-card {
+    background-color: var(--primary-light);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--box-shadow);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    padding: 1.5rem;
+    transition: var(--transition);
+}
+
+.petition-card:hover {
+    box-shadow: var(--box-shadow-lg), var(--glow);
+}
+
+/* Petition Image */
+.petition-image {
+    flex: 1 1 320px;
+    max-width: 420px;
+    height: var(--petition-image-height);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    box-shadow: var(--box-shadow-sm);
+    background-color: var(--primary-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.petition-image img {
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+    display: block;
+    border-radius: var(--border-radius);
+}
+
+/* Petition Content */
+.petition-content {
+    flex: 2 1 480px;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+/* Header */
+.petition-header {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.category-badge {
+    align-self: flex-start;
+    background-color: var(--secondary);
+    color: var(--light-gray);
+    font-weight: 700;
+    padding: 0.3rem 0.7rem;
+    border-radius: var(--border-radius-sm);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    user-select: none;
+}
+
+.petition-title {
+    font-size: 2.2rem;
+    font-weight: 900;
+    color: var(--light);
+}
+
+/* Description */
+.petition-description p {
+    white-space: pre-wrap;
+    color: var(--light-gray);
+    font-size: 1.1rem;
+    line-height: 1.6;
+}
+
+/* Progress Bar */
+.petition-progress {
+    margin-top: 1rem;
+}
+
+.progress-container {
+    background-color: var(--primary-dark);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    height: 22px;
+    box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
+    margin-bottom: 0.3rem;
+    position: relative;
+}
+
+.progress-bar {
+    background: linear-gradient(90deg, var(--accent), var(--accent-dark));
+    height: 100%;
+    transition: width 0.5s ease-in-out;
+    display: flex;
+    align-items: center;
+    padding-left: 0.7rem;
+    font-weight: 700;
+    color: var(--light);
+    font-size: 0.9rem;
+    white-space: nowrap;
+    user-select: none;
+}
+
+.progress-goal {
+    font-size: 0.85rem;
+    color: var(--secondary);
+    font-style: italic;
+}
+
+/* Metadata */
+.petition-meta {
+    display: flex;
+    gap: 1.5rem;
+    font-size: 0.9rem;
+    color: var(--secondary);
+    user-select: none;
+}
+
+.petition-meta span {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.petition-meta i {
+    color: var(--accent);
+}
+
+/* Actions */
+.petition-actions {
+    margin-top: 1rem;
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.btn-edit, .btn-delete, .btn-sign {
+    font-weight: 700;
+    padding: 0.6rem 1.2rem;
+    border-radius: var(--border-radius-sm);
+    border: none;
+    cursor: pointer;
+    transition: var(--transition);
+    text-align: center;
+    text-decoration: none;
+    user-select: none;
+}
+
+.btn-edit {
+    background-color: var(--secondary);
+    color: var(--light);
+    box-shadow: var(--box-shadow-sm);
+}
+
+.btn-edit:hover {
+    background-color: var(--secondary-dark);
+}
+
+.btn-delete {
+    background-color: var(--danger);
+    color: var(--light);
+    box-shadow: var(--box-shadow-sm);
+}
+
+.btn-delete:hover {
+    background-color: var(--accent-dark);
+}
+
+.btn-sign {
+    background-color: var(--accent);
+    color: var(--light);
+    box-shadow: var(--box-shadow-sm);
+}
+
+.btn-sign:hover {
+    background-color: var(--accent-dark);
+}
+
+/* Votes Section */
+.petition-votes {
+    margin-top: 2rem;
+    background-color: var(--primary-dark);
+    padding: 1rem 1.5rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow-sm);
+    color: var(--light-gray);
+}
+
+.petition-votes h3 {
+    margin-bottom: 0.8rem;
+    font-weight: 800;
+    color: var(--light);
+}
+
+.petition-votes form {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 0.8rem;
+}
+
+.btn-vote {
+    flex: 1;
+    background-color: var(--secondary);
+    border: none;
+    border-radius: var(--border-radius-sm);
+    padding: 0.6rem 0;
+    font-weight: 700;
+    font-size: 1.2rem;
+    color: var(--light);
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    user-select: none;
+    box-shadow: var(--box-shadow-sm);
+}
+
+.btn-vote.upvote:hover {
+    background-color: #16a34a; /* verde acceso */
+    box-shadow: 0 0 8px #16a34a;
+}
+
+.btn-vote.downvote:hover {
+    background-color: var(--danger);
+    box-shadow: var(--glow);
+}
+
+.vote-score {
+    font-weight: 800;
+    color: var(--light);
+}
+
+.user-vote-status {
+    font-style: italic;
+    font-size: 0.9rem;
+}
+
+.voted-up {
+    color: #22c55e;
+    font-weight: 700;
+}
+
+.voted-down {
+    color: var(--danger);
+    font-weight: 700;
+}
+
+/* View Count */
+.petition-detail-container > p {
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    color: var(--secondary);
+    user-select: none;
+}
+
+/* Comments Section */
+.comments-section {
+  margin-top: 3rem;
+  background-color: var(--primary-light);
+  border-radius: var(--border-radius-lg);
+  padding: 2rem;
+  box-shadow: var(--box-shadow);
+  color: var(--light);
+  user-select: text;
+}
+
+.comments-section h2 {
+  font-weight: 900;
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+  color: var(--light);
+}
+
+.comments-section form {
+  margin-bottom: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.comments-section form button.btn-primary {
+  align-self: flex-start;
+  background-color: var(--accent);
+  border: none;
+  color: var(--light);
+  font-weight: 700;
+  padding: 0.7rem 1.5rem;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  box-shadow: var(--glow);
+  transition: background-color 0.3s ease;
+  user-select: none;
+}
+
+.comments-section form button.btn-primary:hover {
+  background-color: var(--accent-dark);
+}
+
+.comments-section p {
+  color: var(--light-gray);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.comments-section p a {
+  color: var(--accent);
+  font-weight: 700;
+  text-decoration: underline;
+  transition: color 0.3s ease;
+}
+
+.comments-section p a:hover {
+  color: var(--accent-dark);
+}
+
+/* Lista commenti */
+.comments-list {
+  max-height: 350px;
+  overflow-y: auto;
+  padding-right: 0.3rem;
+}
+
+/* Singolo commento */
+.comment {
+  background-color: var(--primary-dark);
+  padding: 1rem 1.3rem;
+  border-radius: var(--border-radius);
+  margin-bottom: 1rem;
+  box-shadow: var(--box-shadow-sm);
+}
+
+.comment p:first-child {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--accent);
+  margin-bottom: 0.4rem;
+  user-select: text;
+}
+
+.comment p:last-child {
+  color: var(--light-gray);
+  font-size: 1rem;
+  white-space: pre-wrap;
+  user-select: text;
+}
+.comments-section form textarea,
+.comments-section form input,
+.comments-section form select {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  font-size: 1rem;
+  font-family: inherit;
+  color: var(--light);
+  background-color: var(--primary-dark);
+  border: 1.8px solid var(--secondary);
+  border-radius: var(--border-radius);
+  resize: vertical;
+  min-height: 100px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  user-select: text;
+}
+
+.comments-section form textarea:focus,
+.comments-section form input:focus,
+.comments-section form select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 8px var(--glow);
+  outline: none;
+}
+
+/* Social Sharing */
+.social-sharing {
+    margin-top: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    user-select: none;
+}
+
+.social-sharing span {
+    font-weight: 700;
+    color: var(--light);
+}
+
+.social-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--primary-dark);
+    color: var(--light);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    font-size: 1.2rem;
+    transition: var(--transition);
+    box-shadow: var(--box-shadow-sm);
+}
+
+.social-icon:hover {
+    color: var(--accent);
+    box-shadow: 0 0 8px var(--accent);
+}
+
+/* Report Link */
+.report-link {
+    margin-top: 2rem;
+    text-align: center;
+}
+
+.report-link .btn {
+    background-color: var(--danger);
+    color: var(--light);
+    padding: 0.7rem 1.8rem;
+    border-radius: var(--border-radius);
+    font-weight: 700;
+    box-shadow: var(--box-shadow-sm);
+    transition: var(--transition);
+    user-select: none;
+}
+
+.report-link .btn:hover {
+    background-color: var(--accent-dark);
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .petition-card {
+        flex-direction: column;
+        padding: 1rem;
+    }
+    .petition-image {
+        max-width: 100%;
+        height: 180px;
+    }
+    .petition-content {
+        flex: none;
+        width: 100%;
+    }
+    .petition-actions {
+        justify-content: center;
+    }
+    .petition-votes form {
+        flex-direction: column;
+    }
+    .btn-vote {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .petition-title {
+        font-size: 1.6rem;
+    }
+    .petition-description p {
+        font-size: 1rem;
+    }
+}

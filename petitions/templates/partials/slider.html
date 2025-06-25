@@ -9,49 +9,42 @@
 
         <div class="petitions-carousel">
             <div class="petitions-wrapper" id="petitionsWrapper">
-
-                {% for petition in featured_petitions %}
-                <div class="petition-card">
-                    <a href="{% url 'petitions:petition_detail' petition.pk %}" class="petition-link">
-                        <div class="petition-image">
-                            {% if petition.image %}
-                                <img src="{{ petition.image.url }}" alt="{{ petition.title }}">
-                            {% else %}
-                                <img src="{% static 'images/default_petition.jpg' %}" alt="{{ petition.title }}">
-                            {% endif %}
-                        </div>
-                        <div class="petition-content">
-                            <h3>{{ petition.title }}</h3>
-                            <p>{{ petition.description|truncatewords:20 }}</p>
-
-                            <div class="progress-container">
-                                {% with percent=petition.get_signature_percentage %}
-                                <div class="progress-bar" style="width: {{ percent }}%"></div>
-                                {% endwith %}
+                {% if featured_petitions %}
+                    {% for petition in featured_petitions %}
+                        <div class="petition-card">
+                            <a href="{% url 'petitions:petition_detail' petition.pk %}" class="petition-link">
+                                <div class="petition-image">
+                                    {% if petition.image %}
+                                        <img src="{{ petition.image.url }}" alt="{{ petition.title|escape }}">
+                                    {% else %}
+                                        <img src="{% static 'images/default_petition.jpg' %}" alt="{{ petition.title|escape }}">
+                                    {% endif %}
+                                </div>
+                                <div class="petition-content">
+                                    <h3>{{ petition.title }}</h3>
+                                    <p>{{ petition.description|truncatewords:20 }}</p>
+                                    <div class="progress-container">
+                                        {% with percent=petition.get_signature_percentage %}
+                                            <div class="progress-bar" style="width: {{ percent }}%"></div>
+                                        {% endwith %}
+                                    </div>
+                                </div>
+                            </a>
+                            <div class="petition-meta">
+                                <span class="signatures-count">
+                                    {{ petition.signatures.count }} firme su {{ petition.signature_goal }}
+                                </span>
+                                <a href="{% url 'petitions:request_signature' petition.pk %}" class="button primary">
+                                    Firma
+                                </a>
                             </div>
                         </div>
-                    </a>
-                    <div class="petition-meta">
-                        <span class="signatures-count">
-                            {{ petition.signatures.count }} firme su {{ petition.signature_goal }}
-                        </span>
-                        <a href="{% url 'petitions:request_signature' petition.pk %}" class="button primary" style="margin-top: 15px;">
-                            Firma
-                        </a>
-                    </div>
-                </div>
-                {% endfor %}
-
+                    {% endfor %}
+                {% else %}
+                    <p class="no-petitions">Nessuna petizione in evidenza al momento.</p>
+                {% endif %}
             </div>
 
-            <div class="slider-nav">
-                <button class="slider-btn" id="prevBtn" aria-label="Slide precedente">
-                    <i class="fas fa-chevron-left"></i>
-                </button>
-                <button class="slider-btn" id="nextBtn" aria-label="Slide successiva">
-                    <i class="fas fa-chevron-right"></i>
-                </button>
-            </div>
         </div>
     </div>
 </section>
