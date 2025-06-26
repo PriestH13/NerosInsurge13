@@ -40,6 +40,18 @@ class Petition(models.Model):
 
     def __str__(self):
         return self.title
+    
+    @property
+    def upvotes(self):
+        return self.votes.filter(is_upvote=True).count()
+
+    @property
+    def downvotes(self):
+        return self.votes.filter(is_upvote=False).count()
+
+    @property
+    def vote_score(self):
+        return self.upvotes - self.downvotes
 
 #FIRMA
 class Signature(models.Model):
@@ -90,6 +102,8 @@ class PetitionVote(models.Model):
         if self.user:
             return f"{self.user.username} voted {'↑' if self.is_upvote else '↓'}"
         return f"Anonymous ({self.ip_address}) voted {'↑' if self.is_upvote else '↓'}"
+    
+    
 
 
 #ALLEGATO

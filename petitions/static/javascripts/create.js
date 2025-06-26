@@ -292,3 +292,61 @@ document.addEventListener('DOMContentLoaded', () => {
     // Aggiorna i pulsanti quando la finestra viene ridimensionata
     window.addEventListener('resize', updateButtons);
 });
+
+
+// ----- Like funzone che non aggiorna la pagina -----
+document.addEventListener("DOMContentLoaded", function () {
+  const voteForm = document.getElementById("vote-form");
+
+  if (voteForm) {
+    voteForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+      const url = voteForm.dataset.url;
+      const formData = new FormData(voteForm);
+
+      fetch(url, {
+        method: "POST",
+        headers: {
+          "X-CSRFToken": formData.get("csrfmiddlewaretoken"),
+        },
+        body: formData,
+      })
+        .then((response) => response.text())
+        .then((html) => {
+          // reload solo la sezione dei voti
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(html, "text/html");
+          const newVoteSection = doc.querySelector(".petition-votes");
+          document.querySelector(".petition-votes").innerHTML = newVoteSection.innerHTML;
+        });
+    });
+  }
+});
+
+
+// ---Commento per non aggiornare la pagina---
+const commentForm = document.getElementById("comment-form");
+if (commentForm) {
+  commentForm.addEventListener("submit", function (e) {
+    e.preventDefault();
+    const formData = new FormData(commentForm);
+
+    fetch(window.location.href, {
+      method: "POST",
+      headers: {
+        "X-CSRFToken": formData.get("csrfmiddlewaretoken"),
+      },
+      body: formData,
+    })
+      .then((response) => response.text())
+      .then((html) => {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, "text/html");
+
+        const newComments = doc.querySelector(".comments-section");
+        document.querySelector(".comments-section").innerHTML = newComments.innerHTML;
+
+        commentForm.reset();
+      });
+  });
+}

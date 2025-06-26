@@ -11,6 +11,7 @@ from django.contrib import messages
 from django.core.mail import send_mail
 from django.urls import reverse
 from .utils import get_client_ip
+from django.template.loader import render_to_string
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from django.contrib.admin.views.decorators import staff_member_required
@@ -277,13 +278,11 @@ class ConfirmSignatureView(View):
         messages.success(request, "La tua firma è stata confermata!")
         return redirect('petitions:petition_detail', pk=pending.petition.pk)
 
-
 class PetitionVoteView(View):
     def post(self, request, pk):
         petition = get_object_or_404(Petition, pk=pk)
         is_upvote = request.POST.get('vote') == 'up'
         ip = get_client_ip(request)
-
         user = request.user if request.user.is_authenticated else None
 
         vote_filter = {'petition': petition}
@@ -295,7 +294,6 @@ class PetitionVoteView(View):
             vote_filter['ip_address'] = ip
 
         vote = PetitionVote.objects.filter(**vote_filter).first()
-
         if vote:
             if vote.is_upvote != is_upvote:
                 vote.is_upvote = is_upvote
@@ -310,7 +308,15 @@ class PetitionVoteView(View):
                 is_upvote=is_upvote,
             )
 
-        return redirect('petitions:petition_detail', pk=pk)
+        petition.refresh_from_db()
+
+        html = render_to_string("petitions/partials/votes.html", {
+            "petition": petition,
+            "user_vote": PetitionVote.objects.filter(**vote_filter).first()
+        }, request=request)
+
+        return JsonResponse({'html': html})
+
 
 
 class ReportPetitionView(LoginRequiredMixin, FormView):

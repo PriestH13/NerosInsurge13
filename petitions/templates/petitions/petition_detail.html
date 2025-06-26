@@ -3,8 +3,7 @@
 
 {% block extra_head %}
 <link rel="stylesheet" href="{% static 'css/create.css' %}">
-<link rel="stylesheet" href="{% static 'css/petition_detail.css' %}">
-<script src="{% static 'js/register.js' %}" defer></script>
+<script src="{% static 'javascripts/create.js' %}" defer></script>
 {% endblock %}
 
 {% block global_search %}{% endblock %}
@@ -66,19 +65,16 @@
       <div class="petition-votes">
   <h3>Vota questa petizione</h3>
 
-  <form method="post" action="{% url 'petitions:petition_vote' petition.pk %}">
-    {% csrf_token %}
-    <button type="submit" name="vote" value="up" class="btn-vote upvote">
-      👍 {{ petition.upvotes }}
-    </button>
-    <button type="submit" name="vote" value="down" class="btn-vote downvote">
-      👎 {{ petition.downvotes }}
-    </button>
-  </form>
-
-  <p class="vote-score">
-    Voto complessivo: <strong>{{ petition.vote_score }}</strong>
-  </p>
+<form id="vote-form" data-url="{% url 'petitions:petition_vote' petition.pk %}">
+  {% csrf_token %}
+  <button type="submit" name="vote" value="up" class="btn-vote upvote">👍 {{ petition.upvotes }}</button>
+  <button type="submit" name="vote" value="down" class="btn-vote downvote">👎 {{ petition.downvotes }}</button>
+</form>
+<div class="vote-summary">
+  <p>👍 Voti positivi: <strong>{{ petition.upvotes }}</strong></p>
+  <p>👎 Voti negativi: <strong>{{ petition.downvotes }}</strong></p>
+  <p>📊 Voto netto: <strong>{{ petition.vote_score }}</strong></p>
+</div>
 
   {% if user_vote %}
     <p class="user-vote-status">
@@ -99,11 +95,11 @@
   <h2>Commenti ({{ comments.count }})</h2>
 
   {% if user.is_authenticated %}
-    <form method="post" action=".">
-      {% csrf_token %}
-      {{ form.as_p }}
-      <button type="submit" class="btn btn-primary">Aggiungi commento</button>
-    </form>
+<form id="comment-form" method="post" action=".">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit" class="btn btn-primary">Aggiungi commento</button>
+</form>
   {% else %}
     <p>Devi <a href="">accedere</a> per scrivere un commento.</p>
   {% endif %}
