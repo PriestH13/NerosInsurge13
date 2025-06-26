@@ -19,26 +19,47 @@
                 </button>
             </div>
             
-            <div class="filters">
-                <select name="category">
-                    <option value="">Tutte le categorie</option>
-                    {% for category in categories %}
-                        <option value="{{ category.name }}" {% if category.name == request.GET.category %}selected{% endif %}>
-                            {{ category.name }}
-                        </option>
-                    {% endfor %}
-                </select>
-                
-                <select name="order">
-                    <option value="recenti" {% if request.GET.order == "recenti" %}selected{% endif %}>Più recenti</option>
-                    <option value="popolari" {% if request.GET.order == "popolari" %}selected{% endif %}>Più popolari</option>
-                </select>
-                
-                <button type="submit" class="button primary">
-                    <i class="fas fa-filter"></i> Filtra
-                </button>
-            </div>
-        </form>
+    <div class="filters">
+        <!-- Categoria -->
+        <select name="category" class="filter-select">
+            <option value="">Tutte le categorie</option>
+            {% for cat in categories %}
+                <option value="{{ cat.name }}" {% if cat.name == category_selected %}selected{% endif %}>
+                    {{ cat.name }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <!-- Località -->
+        <select name="location" class="filter-select">
+            <option value="">Tutte le località</option>
+            <option value="Albania" {% if request.GET.location == "Albania" %}selected{% endif %}>Albania</option>
+            <option value="Italia" {% if request.GET.location == "Italia" %}selected{% endif %}>Italia</option>
+            <option value="Germania" {% if request.GET.location == "Germania" %}selected{% endif %}>Germania</option>
+            <!-- Aggiungi altre località se vuoi -->
+        </select>
+
+        <!-- Ordinamento -->
+        <select name="order" class="filter-select">
+            <option value="recenti" {% if order_selected == 'recenti' %}selected{% endif %}>Più recenti</option>
+            <option value="meno_recente" {% if order_selected == 'meno_recente' %}selected{% endif %}>Meno recenti</option>
+        </select>
+
+
+
+        <!-- Ordinamento -->
+        <select name="order" class="filter-select">
+            <option value="recenti" {% if order_selected == 'recenti' %}selected{% endif %}>Più recenti</option>
+            <option value="meno_recente" {% if order_selected == 'meno_recente' %}selected{% endif %}>Meno recenti</option>
+        </select>
+
+        <!-- Pulsante -->
+        <button type="submit" class="button primary">
+            <i class="fas fa-filter"></i> Filtra
+        </button>
+    </div>
+    
+</form>
 
         <div class="petitions-grid">
             {% for petition in petitions %}

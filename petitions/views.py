@@ -4,7 +4,7 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, D
 from django.views.generic.edit import FormMixin
 from django.db.models import Count, Q
 from .models import Petition, PetitionStatus, PetitionCategory, Signature, PendingSignature, PetitionVote, Notification, PetitionView, ModerationAction
-from .forms import PetitionForm, SignatureForm, CommentForm, ReportForm, ModerationActionForm
+from .forms import PetitionForm, SignatureForm, CommentForm, ReportForm, ModerationActionForm, Tag
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.http import HttpResponseForbidden, JsonResponse
 from django.contrib import messages
@@ -192,21 +192,51 @@ class PetitionSearchView(ListView):
     paginate_by = 6
 
     def get_queryset(self):
-        query = self.request.GET.get('q', '')
-        qs = Petition.objects.filter(status=PetitionStatus.PUBLISHED, is_active=True)
-        if query:
-            qs = qs.filter(
-                Q(title__icontains=query) | Q(description__icontains=query)
-            ).order_by('-created_at')
+        qs = Petition.objects.filter(is_active=True)
+
+        q = self.request.GET.get('q')
+        if q:
+            qs = qs.filter(Q(title__icontains=q) | Q(description__icontains=q))
+
+        category = self.request.GET.get('category')
+        if category:
+            qs = qs.filter(category__name=category)
+
+        status = self.request.GET.get('status')
+        if status:
+            qs = qs.filter(status=status)
+
+        tags = self.request.GET.getlist('tags')
+        if tags:
+            qs = qs.filter(tags__name__in=tags).distinct()
+
+        order = self.request.GET.get('order')
+        if order == 'recenti':
+            qs = qs.order_by('-created_at')
+        elif order == 'meno_recente':
+            qs = qs.order_by('created_at')
+        elif order == 'popolari':
+            qs = qs.annotate(num_signatures=Count('signatures')).order_by('-num_signatures')
         else:
-            qs = qs.none()
+            qs = qs.order_by('-created_at')
+
         return qs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['query'] = self.request.GET.get('q', '')
         context['categories'] = PetitionCategory.objects.all()
+        context['statuses'] = PetitionStatus.choices
+        context['tags'] = Tag.objects.all()
+
+        context['category_selected'] = self.request.GET.get('category', '')
+        context['status_selected'] = self.request.GET.get('status', '')
+        context['order_selected'] = self.request.GET.get('order', 'recenti')
+        context['tags_selected'] = self.request.GET.getlist('tags')  # <--- aggiunto
+
         return context
+
+
 
 
 class RequestSignatureView(FormView):

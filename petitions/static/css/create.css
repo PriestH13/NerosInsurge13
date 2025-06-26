@@ -409,6 +409,7 @@ main.main-content {
 }
 
 /* Search & Filters */
+/* Contenitore principale della ricerca + filtri */
 .search-filters {
     margin: 2rem 0 3rem;
     display: grid;
@@ -423,6 +424,7 @@ main.main-content {
     }
 }
 
+/* Campo di ricerca testuale */
 .search-bar {
     position: relative;
     width: 100%;
@@ -446,6 +448,7 @@ main.main-content {
     box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.2);
 }
 
+/* Pulsante cerca (icona lente) */
 .search-bar button {
     position: absolute;
     right: 0.5rem;
@@ -463,6 +466,7 @@ main.main-content {
     color: var(--accent);
 }
 
+/* Sezione dei filtri: categoria, tag, stato, ordine */
 .filters {
     display: grid;
     grid-template-columns: 1fr;
@@ -483,6 +487,7 @@ main.main-content {
     }
 }
 
+/* Stile per ogni select (categoria, stato, ordine, tag) */
 .filters select {
     padding: 0.8rem 1rem;
     border: 2px solid var(--light-gray);
