@@ -253,10 +253,12 @@ class RequestSignatureView(FormView):
         return context
 
     def form_valid(self, form):
+        first_name = form.cleaned_data['first_name']
+        last_name = form.cleaned_data['last_name']
         email = form.cleaned_data['email']
         petition = self.petition
 
-        # Blocco  2 mail
+        # Verifica firma già esistente
         already_signed = Signature.objects.filter(petition=petition, email=email).exists()
         already_pending = PendingSignature.objects.filter(petition=petition, email=email, confirmed=False).exists()
 
@@ -268,11 +270,13 @@ class RequestSignatureView(FormView):
             if self.request.user.is_authenticated:
                 Signature.objects.create(
                     petition=petition,
+                    first_name=first_name,
+                    last_name=last_name,
                     email=email
                 )
                 Notification.objects.create(
                     user=petition.created_by,
-                    message=f"{self.request.user.username} ha firmato la tua petizione '{petition.title}'.",
+                    message=f"{first_name} {last_name} ha firmato la tua petizione '{petition.title}'.",
                     link=reverse('petitions:petition_detail', kwargs={'pk': petition.pk})
                 )
                 messages.success(self.request, "Hai firmato con successo questa petizione.")
@@ -293,6 +297,8 @@ class RequestSignatureView(FormView):
 
 
 
+
+
 class ConfirmSignatureView(View):
     def get(self, request, token):
         try:
@@ -301,12 +307,19 @@ class ConfirmSignatureView(View):
             messages.error(request, "Link non valido o firma già confermata.")
             return redirect('petitions:home')
 
-        Signature.objects.create(petition=pending.petition, email=pending.email)
+        Signature.objects.create(
+            petition=pending.petition,
+            email=pending.email,
+            first_name=pending.first_name,
+            last_name=pending.last_name,
+        )
         pending.confirmed = True
         pending.save()
 
         messages.success(request, "La tua firma è stata confermata!")
         return redirect('petitions:petition_detail', pk=pending.petition.pk)
+
+
 
 class PetitionVoteView(View):
     def post(self, request, pk):

@@ -20,7 +20,9 @@ class PetitionForm(forms.ModelForm):
         self.fields['image'].required = False
 
 class SignatureForm(forms.Form):
-    email = forms.EmailField(label='La tua email')
+    first_name = forms.CharField(label="Nome", max_length=30, required=True)
+    last_name = forms.CharField(label="Cognome", max_length=30, required=True)
+    email = forms.EmailField(label="Email", required=True)
 
 
 from django import forms

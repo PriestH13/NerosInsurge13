@@ -76,6 +76,22 @@
   <p>📊 Voto netto: <strong>{{ petition.vote_score }}</strong></p>
 </div>
 
+<div class="signatures-container" aria-live="polite" aria-label="Elenco firmatari">
+  <div id="signatures-marquee" class="marquee">
+    <div class="marquee-content">
+      {% for signature in petition.signatures.all %}
+        <span class="signature-name">
+          {{ signature.first_name }} {{ signature.last_name }}
+        </span>
+      {% empty %}
+        <span class="signature-name">Nessuna firma ancora.</span>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+
+
   {% if user_vote %}
     <p class="user-vote-status">
       Hai votato: 

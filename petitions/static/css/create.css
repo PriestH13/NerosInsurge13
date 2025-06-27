@@ -1730,3 +1730,43 @@ select[name="category"] {
         font-size: 1rem;
     }
 }
+.signatures-container {
+  overflow: hidden;
+  white-space: nowrap;
+  border: 1px solid #ddd;
+  padding: 10px;
+  background: #f9f9f9;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  position: relative;
+  height: 40px;
+}
+
+.marquee {
+  display: inline-block;
+  white-space: nowrap;
+  will-change: transform;
+  animation: marqueeScroll 20s linear infinite;
+}
+
+.marquee-content {
+  display: inline-block;
+}
+
+.signature-name {
+  display: inline-block;
+  margin-right: 3rem;
+  font-weight: 600;
+  font-size: 1rem;
+  color: #222;
+  user-select: none;
+}
+
+/* L'animazione scrolla da destra a sinistra */
+@keyframes marqueeScroll {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}

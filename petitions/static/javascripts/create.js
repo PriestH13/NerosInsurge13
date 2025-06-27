@@ -373,3 +373,12 @@ document.addEventListener('DOMContentLoaded', () => {
         .catch(err => console.error('Errore caricamento risultati:', err));
     });
 });
+
+document.addEventListener('DOMContentLoaded', () => {
+  const marquee = document.querySelector('.marquee');
+  const content = marquee.querySelector('.marquee-content');
+
+  // Clona il contenuto per farlo scorrere in loop continuo
+  const clone = content.cloneNode(true);
+  marquee.appendChild(clone);
+});

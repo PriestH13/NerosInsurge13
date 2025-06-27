@@ -57,24 +57,29 @@ class Petition(models.Model):
 class Signature(models.Model):
     petition = models.ForeignKey(Petition, on_delete=models.CASCADE, related_name='signatures')
     email = models.EmailField(null=True, blank=True)
+    first_name = models.CharField(max_length=30, null=True, blank=True)
+    last_name = models.CharField(max_length=30, null=True, blank=True)
     signed_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         unique_together = ('petition', 'email')
 
     def __str__(self):
-        return f"{self.email} signed '{self.petition.title}'"
+        return f"{self.first_name} {self.last_name} ({self.email}) signed '{self.petition.title}'"
 
 
 class PendingSignature(models.Model):
     petition = models.ForeignKey(Petition, on_delete=models.CASCADE, related_name='pending_signatures')
     email = models.EmailField()
+    first_name = models.CharField(max_length=30)
+    last_name = models.CharField(max_length=30)
     token = models.UUIDField(default=uuid.uuid4, unique=True)
     confirmed = models.BooleanField(default=False)
     requested_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.email} - {'Confirmed' if self.confirmed else 'Pending'}"
+        return f"{self.first_name} {self.last_name} - {self.email} - {'Confirmed' if self.confirmed else 'Pending'}"
+
 
 
 #COMMENTO

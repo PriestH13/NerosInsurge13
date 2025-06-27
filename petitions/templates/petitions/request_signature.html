@@ -12,12 +12,18 @@
     <h2>Firma la petizione: {{ petition.title }}</h2>
     <p>{{ petition.description }}</p>
 
-    <form method="post" novalidate>
-      {% csrf_token %}
-      {{ form.as_p }}
+<form method="post" novalidate>
+  {% csrf_token %}
+  <label for="id_first_name">Nome:</label>
+  {{ form.first_name }}
+  <label for="id_last_name">Cognome:</label>
+  {{ form.last_name }}
+  <label for="id_email">Email:</label>
+  {{ form.email }}
+  
+  <button type="submit" class="button primary">Invia Firma</button>
+</form>
 
-      <button type="submit" class="button primary">Invia Firma</button>
-    </form>
   </div>
 </main>
 {% endblock %}
