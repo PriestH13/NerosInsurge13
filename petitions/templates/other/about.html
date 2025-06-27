@@ -1,20 +1,36 @@
 {% extends "base.html" %}
+{% load static %}
+
+{% block title %}Chi siamo{% endblock %}
+
+{% block extra_head %}
+  <link rel="stylesheet" href="{% static 'css/other.css' %}">
+  <script src="{% static 'js/register.js' %}" defer></script>
+{% endblock %}
+
+{% block global_search %}{% endblock %}
+{% block page_content %}{% endblock %}
+
 {% block content %}
-<div class="container" style="padding: 2rem;">
-  <h1>Chi siamo</h1>
-  <p>Siamo una comunità impegnata nel dare voce ai cittadini attraverso petizioni online trasparenti, sicure e accessibili.</p>
+  <div class="about-page about-padding">
+    <div class="about-title">Chi siamo</div>
+    <p class="about-text">
+      Siamo una comunità impegnata nel dare voce ai cittadini attraverso petizioni online trasparenti, sicure e accessibili.
+    </p>
 
-  <h3>La nostra missione</h3>
-  <p>
-    Offrire uno strumento libero e potente per far sentire le proprie idee, raccogliere firme, creare cambiamento concreto nella società.
-  </p>
+    <div class="about-subtitle">La nostra missione</div>
+    <p class="about-text">
+      Offrire uno strumento libero e potente per far sentire le proprie idee, raccogliere firme, creare cambiamento concreto nella società.
+    </p>
 
-  <h3>Il team</h3>
-  <ul>
-    <li>Mateo Prifti – Fondatore e sviluppatore</li>
-  </ul>
+    <div class="about-subtitle">Il team</div>
+    <ul class="about-list">
+      <li>Mateo Prifti – Fondatore e sviluppatore</li>
+    </ul>
 
-  <h3>Contattaci</h3>
-  <p>Per collaborazioni o domande: <a href="mailto:info@nerosinsurge13.it">info@nerosinsurge13.it</a></p>
-</div>
+    <div class="about-subtitle">Contattaci</div>
+    <p class="about-text">
+      Per collaborazioni o domande: <a href="mailto:info@nerosinsurge13.it">info@nerosinsurge13.it</a>
+    </p>
+  </div>
 {% endblock %}

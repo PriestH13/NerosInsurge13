@@ -1,29 +1,41 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block page_content %}{% endblock %}
 
 {% block extra_head %}
-<link rel="stylesheet" href="{% static 'css/create.css' %}">
+<link rel="stylesheet" href="{% static 'css/signature.css' %}">
 {% endblock %}
+
+{% block page_content %}{% endblock %}
 
 {% block content %}
 <main class="main-content">
   <div class="container">
-    <h2>Firma la petizione: {{ petition.title }}</h2>
-    <p>{{ petition.description }}</p>
+    <h2 class="section-title">Firma la petizione: {{ petition.title }}</h2>
+    
+    <p style="margin-bottom: 2rem; color: var(--light-gray);">
+      {{ petition.description|truncatechars:300 }}
+    </p>
 
-<form method="post" novalidate>
-  {% csrf_token %}
-  <label for="id_first_name">Nome:</label>
-  {{ form.first_name }}
-  <label for="id_last_name">Cognome:</label>
-  {{ form.last_name }}
-  <label for="id_email">Email:</label>
-  {{ form.email }}
-  
-  <button type="submit" class="button primary">Invia Firma</button>
-</form>
+    <form method="post" novalidate class="petition-form">
+      {% csrf_token %}
 
+      <div class="form-group">
+        <label for="id_first_name">Nome</label>
+        {{ form.first_name }}
+      </div>
+
+      <div class="form-group">
+        <label for="id_last_name">Cognome</label>
+        {{ form.last_name }}
+      </div>
+
+      <div class="form-group">
+        <label for="id_email">Email</label>
+        {{ form.email }}
+      </div>
+
+      <button type="submit" class="button primary">Invia Firma</button>
+    </form>
   </div>
 </main>
 {% endblock %}

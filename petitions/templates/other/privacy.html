@@ -1,27 +1,37 @@
 {% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Privacy Policy{% endblock %}
+
+{% block extra_head %}
+  <link rel="stylesheet" href="{% static 'css/other.css' %}">
+{% endblock %}
+
+{% block global_search %}{% endblock %}
+{% block page_content %}{% endblock %}
 
 {% block content %}
-  <h1>Privacy Policy</h1>
+  <div class="privacy-page privacy-padding">
+    <div class="privacy-title">Privacy Policy</div>
 
-  <p>La tua privacy è importante per noi. Questa informativa spiega come raccogliamo, usiamo e proteggiamo i tuoi dati personali.</p>
+    <p class="privacy-text">La tua privacy è importante per noi. Questa informativa spiega come raccogliamo, usiamo e proteggiamo i tuoi dati personali.</p>
 
-  <h2>Informazioni raccolte</h2>
-  <p>Descrivi quali dati raccogli (es. nome, email, IP, cookies ecc.)</p>
+    <div class="privacy-section">Informazioni raccolte</div>
+    <p class="privacy-text">Descrivi quali dati raccogli (es. nome, email, IP, cookies ecc.)</p>
 
-  <h2>Uso dei dati</h2>
-  <p>Spiega come utilizzi i dati (es. per migliorare il servizio, comunicazioni, analisi ecc.)</p>
+    <div class="privacy-section">Uso dei dati</div>
+    <p class="privacy-text">Spiega come utilizzi i dati (es. per migliorare il servizio, comunicazioni, analisi ecc.)</p>
 
-  <h2>Condivisione dei dati</h2>
-  <p>Specificare se e con chi i dati vengono condivisi.</p>
+    <div class="privacy-section">Condivisione dei dati</div>
+    <p class="privacy-text">Specificare se e con chi i dati vengono condivisi.</p>
 
-  <h2>Diritti degli utenti</h2>
-  <p>Spiega i diritti degli utenti riguardo i loro dati personali (accesso, modifica, cancellazione, ecc.)</p>
+    <div class="privacy-section">Diritti degli utenti</div>
+    <p class="privacy-text">Spiega i diritti degli utenti riguardo i loro dati personali (accesso, modifica, cancellazione, ecc.)</p>
 
-  <h2>Sicurezza</h2>
-  <p>Descrivi come proteggi i dati degli utenti.</p>
+    <div class="privacy-section">Sicurezza</div>
+    <p class="privacy-text">Descrivi come proteggi i dati degli utenti.</p>
 
-  <h2>Contatti</h2>
-  <p>Fornisci un contatto per richieste relative alla privacy.</p>
-
-  <p>...aggiungi tutto il testo necessario...</p>
+    <div class="privacy-section">Contatti</div>
+    <p class="privacy-text">Per richieste relative alla privacy, contattaci a: <a href="mailto:privacy@nerosinsurge13.it">privacy@nerosinsurge13.it</a></p>
+  </div>
 {% endblock %}

@@ -1273,7 +1273,7 @@ select[name="category"] {
     display: flex;
     flex-wrap: wrap;
     gap: 1.5rem;
-    padding: 1.5rem;
+    padding: 5rem;
     transition: var(--transition);
 }
 

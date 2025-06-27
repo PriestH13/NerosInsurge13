@@ -7,11 +7,13 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
 {% endblock %}
 {% block page_content %}{% endblock %}
+{% block global_search %}{% endblock %}
+
 
 {% block content %}
 <main>
-    <div class="container" style="max-width: 600px; margin: 0 auto;">
-        <h2 class="section-title" style="text-align: left; margin-bottom: 1.5rem;">
+    <div class="container" style="max-width: 800px;">
+        <h2 class="section-title" style="text-align: left; margin-bottom: 5rem;">
             {% if form.instance.pk %}Modifica Petizione{% else %}Crea Petizione{% endif %}
         </h2>
         

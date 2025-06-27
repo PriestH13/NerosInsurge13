@@ -4,101 +4,83 @@
 {% block title %}Ricerca Petizioni{% endblock %}
 
 {% block extra_head %}
-<link rel="stylesheet" href="{% static 'css/create.css' %}">
-<script src="{% static 'javascripts/create.js' %}" defer></script>
+<link rel="stylesheet" href="{% static 'css/search.css' %}">
+<script src="{% static 'javascripts/search.js' %}" defer></script>
 {% endblock %}
 
 {% block global_search %}{% endblock %}
 {% block page_content %}{% endblock %}
 
 {% block content %}
-<h1>Ricerca Petizioni</h1>
+<div class="search-page">
+  <div class="search-title-large">Ricerca Petizioni</div>
 
-<form method="get" action="{% url 'petitions:petition_search' %}" class="search-filters">
-    <!-- Barra di ricerca -->
-    <div class="search-bar">
-        <input type="text" name="q" id="q" placeholder="Cerca petizioni..." value="{{ query }}">
-        <button type="submit" aria-label="Cerca">
-            <i class="fas fa-search"></i>
-        </button>
-    </div>
+  <form method="get" action="{% url 'petitions:petition_search' %}" class="search-filters">
+      <div class="search-bar">
+          <input type="text" name="q" id="q" placeholder="Cerca petizioni..." value="{{ query }}">
+          <button type="submit" aria-label="Cerca">
+              <i class="fas fa-search"></i>
+          </button>
+      </div>
 
-    <!-- Filtri -->
-    <div class="filters">
-        <!-- Categoria -->
-        <select name="category" class="filter-select">
-            <option value="">Tutte le categorie</option>
-            {% for cat in categories %}
-                <option value="{{ cat.name }}" {% if cat.name == category_selected %}selected{% endif %}>
-                    {{ cat.name }}
-                </option>
-            {% endfor %}
-        </select>
+      <div class="filters">
+          <select name="category" class="filter-select">
+              <option value="">Tutte le categorie</option>
+              {% for cat in categories %}
+                  <option value="{{ cat.name }}" {% if cat.name == category_selected %}selected{% endif %}>{{ cat.name }}</option>
+              {% endfor %}
+          </select>
 
-        <!-- Località -->
-        <select name="location" class="filter-select">
-            <option value="">Tutte le località</option>
-            <option value="Albania" {% if request.GET.location == "Albania" %}selected{% endif %}>Albania</option>
-            <option value="Italia" {% if request.GET.location == "Italia" %}selected{% endif %}>Italia</option>
-            <option value="Germania" {% if request.GET.location == "Germania" %}selected{% endif %}>Germania</option>
-            <!-- Aggiungi altre località se vuoi -->
-        </select>
+          <select name="location" class="filter-select">
+              <option value="">Tutte le località</option>
+              <option value="Albania" {% if request.GET.location == "Albania" %}selected{% endif %}>Albania</option>
+              <option value="Italia" {% if request.GET.location == "Italia" %}selected{% endif %}>Italia</option>
+              <option value="Germania" {% if request.GET.location == "Germania" %}selected{% endif %}>Germania</option>
+          </select>
 
-        <!-- Ordinamento -->
-        <select name="order" class="filter-select">
-            <option value="recenti" {% if order_selected == 'recenti' %}selected{% endif %}>Più recenti</option>
-            <option value="meno_recente" {% if order_selected == 'meno_recente' %}selected{% endif %}>Meno recenti</option>
-        </select>
+          <select name="order" class="filter-select">
+              <option value="recenti" {% if order_selected == 'recenti' %}selected{% endif %}>Più recenti</option>
+              <option value="meno_recente" {% if order_selected == 'meno_recente' %}selected{% endif %}>Meno recenti</option>
+          </select>
 
+          <button type="submit" class="button primary">
+              <i class="fas fa-filter"></i> Filtra
+          </button>
+      </div>
+  </form>
 
+  <hr>
 
-        <!-- Ordinamento -->
-        <select name="order" class="filter-select">
-            <option value="recenti" {% if order_selected == 'recenti' %}selected{% endif %}>Più recenti</option>
-            <option value="meno_recente" {% if order_selected == 'meno_recente' %}selected{% endif %}>Meno recenti</option>
-        </select>
+  {% if query %}
+      <div class="search-title-medium">Risultati per: "{{ query }}"</div>
 
-        <!-- Pulsante -->
-        <button type="submit" class="button primary">
-            <i class="fas fa-filter"></i> Filtra
-        </button>
-    </div>
-    
-</form>
+      {% if results %}
+          <ul>
+              {% for petition in results %}
+                  <li>
+                      <a href="{% url 'petitions:petition_detail' petition.pk %}">{{ petition.title }}</a><br>
+                      <small>{{ petition.description|truncatewords:20 }}</small><br>
+                      <small><strong>Categoria:</strong> {{ petition.category.name|default:"Nessuna" }}</small>
+                  </li>
+              {% endfor %}
+          </ul>
 
-<hr>
-
-{% if query %}
-    <h2>Risultati per: "{{ query }}"</h2>
-
-    {% if results %}
-        <ul>
-            {% for petition in results %}
-                <li>
-                    <a href="{% url 'petitions:petition_detail' petition.pk %}">
-                        {{ petition.title }}
-                    </a><br>
-                    <small>{{ petition.description|truncatewords:20 }}</small><br>
-                    <small><strong>Categoria:</strong> {{ petition.category.name|default:"Nessuna" }}</small>
-                </li>
-            {% endfor %}
-        </ul>
-
-        {% if is_paginated %}
-            <div class="pagination">
-                {% if page_obj.has_previous %}
-                    <a href="?q={{ query }}&page={{ page_obj.previous_page_number }}">Precedente</a>
-                {% endif %}
-                <span>Pagina {{ page_obj.number }} di {{ page_obj.paginator.num_pages }}</span>
-                {% if page_obj.has_next %}
-                    <a href="?q={{ query }}&page={{ page_obj.next_page_number }}">Successiva</a>
-                {% endif %}
-            </div>
-        {% endif %}
-    {% else %}
-        <p>Nessuna petizione trovata.</p>
-    {% endif %}
-{% else %}
-    <p>Inserisci un termine di ricerca per trovare una petizione.</p>
-{% endif %}
+          {% if is_paginated %}
+              <div class="pagination">
+                  {% if page_obj.has_previous %}
+                      <a href="?q={{ query }}&page={{ page_obj.previous_page_number }}">Precedente</a>
+                  {% endif %}
+                  <span>Pagina {{ page_obj.number }} di {{ page_obj.paginator.num_pages }}</span>
+                  {% if page_obj.has_next %}
+                      <a href="?q={{ query }}&page={{ page_obj.next_page_number }}">Successiva</a>
+                  {% endif %}
+              </div>
+          {% endif %}
+      {% else %}
+          <p>Nessuna petizione trovata.</p>
+      {% endif %}
+  {% else %}
+      <p>Inserisci un termine di ricerca per trovare una petizione.</p>
+  {% endif %}
+</div>
 {% endblock %}
