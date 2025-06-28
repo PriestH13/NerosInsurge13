@@ -64,7 +64,7 @@ body {
 
 /* Profile Container */
 .profile-container {
-    max-width: 480px;
+    /* max-width: 800px; */
     margin: 4rem auto;
     background-color: var(--primary-dark);
     border-radius: var(--border-radius);
@@ -156,7 +156,7 @@ body {
 
 /* Profile Edit Container */
 .profile-edit-container {
-    max-width: 480px;
+    max-width: 800px;
     margin: 3rem auto;
     background-color: var(--primary-dark);
     padding: 2rem 2.5rem;
