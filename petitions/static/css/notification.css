@@ -1,8 +1,194 @@
-.badge {
-  background-color: red;
-  color: white;
+/* Notification Wrapper */
+.notification-header {
+  background-color: var(--primary);
+  padding: 2rem;
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow-sm);
+  margin-bottom: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.notification-header h2 {
+  color: var(--light);
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+/* Bell + badge */
+#notification-container {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  font-size: 1.75rem;
+  color: var(--light);
+}
+
+#notification-bell.has-notifications {
+  color: var(--accent);
+}
+
+.unread-count {
+  background-color: var(--accent);
+  color: var(--light);
+  font-size: 0.75rem;
+  font-weight: bold;
   padding: 2px 6px;
   border-radius: 50%;
-  font-size: 0.75rem;
-  margin-left: 5px;
+  position: absolute;
+  top: -5px;
+  right: -10px;
+  box-shadow: var(--glow);
+  transition: var(--transition);
+}
+
+.unread-count.hidden {
+  display: none;
+}
+
+/* Filters */
+.notification-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+}
+
+.filter-select {
+  padding: 0.75rem 1rem;
+  background-color: var(--primary-light);
+  border: 2px solid var(--dark-gray);
+  border-radius: var(--border-radius-sm);
+  color: var(--light);
+  font-size: 1rem;
+  transition: var(--transition);
+}
+
+.filter-select:focus {
+  border-color: var(--accent);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.2);
+}
+
+/* Segna tutte come lette */
+.mark-all-read-button {
+  padding: 0.75rem 1.25rem;
+  background-color: transparent;
+  color: var(--accent);
+  border: 2px solid var(--accent);
+  border-radius: var(--border-radius-sm);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.mark-all-read-button:hover:not(:disabled) {
+  background-color: var(--accent);
+  color: var(--light);
+  box-shadow: var(--glow);
+}
+
+.mark-all-read-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Lista notifiche */
+.notification-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.notification-item {
+  background-color: var(--primary-light);
+  color: var(--light);
+  padding: 1.25rem;
+  border-radius: var(--border-radius-sm);
+  box-shadow: var(--box-shadow-sm);
+  cursor: pointer;
+  transition: var(--transition);
+  border-left: 4px solid transparent;
+}
+
+.notification-item.unread {
+  border-left-color: var(--accent);
+  font-weight: 600;
+}
+
+.notification-item:hover {
+  background-color: var(--primary);
+  transform: translateY(-2px);
+  box-shadow: var(--box-shadow), var(--glow);
+}
+
+.notification-item a {
+  color: var(--accent);
+  font-weight: 600;
+  text-decoration: none;
+  transition: var(--transition);
+}
+
+.notification-item a:hover {
+  color: var(--light);
+  text-decoration: underline;
+}
+
+.notification-item small {
+  color: var(--gray);
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
+  display: block;
+}
+
+/* Nessuna notifica */
+.no-notifications {
+  color: var(--gray);
+  text-align: center;
+  padding: 2rem;
+  font-style: italic;
+}
+
+/* Paginazione coerente */
+.pagination {
+  margin-top: 2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  color: var(--light);
+}
+
+.pagination-link {
+  padding: 0.6rem 1.2rem;
+  background: var(--accent);
+  color: var(--light);
+  border-radius: var(--border-radius-sm);
+  text-decoration: none;
+  transition: var(--transition);
+}
+
+.pagination-link:hover {
+  background-color: var(--accent-dark);
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .notification-header {
+    padding: 1rem;
+  }
+
+  .notification-filters {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .notification-item {
+    padding: 1rem;
+  }
 }

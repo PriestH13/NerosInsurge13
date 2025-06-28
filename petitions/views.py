@@ -387,6 +387,7 @@ class NotificationListView(LoginRequiredMixin, ListView):
     model = Notification
     template_name = 'notification/notification_list.html'
     context_object_name = 'notifications'
+    paginate_by = 10
 
     def get_queryset(self):
         return self.request.user.notifications.order_by('-created_at')
@@ -395,7 +396,7 @@ class NotificationListView(LoginRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         context['unread_notifications_count'] = self.request.user.notifications.filter(is_read=False).count()
         return context
-    
+
 
 @require_POST
 @login_required
