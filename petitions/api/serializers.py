@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Petition, Comment
+from ..models import Petition, Comment
 
 class PetitionSerializer(serializers.ModelSerializer):
     class Meta:

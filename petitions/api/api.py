@@ -4,9 +4,9 @@ from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.core.mail import send_mail
-from .models import Petition, PetitionStatus, Comment, Signature, PendingSignature, PetitionVote
+from ..models import Petition, PetitionStatus, Comment, Signature, PendingSignature, PetitionVote
 from .serializers import PetitionSerializer, CommentSerializer
-from .utils import get_client_ip
+from ..utils import get_client_ip
 
 
 class PetitionListAPI(generics.ListCreateAPIView):
