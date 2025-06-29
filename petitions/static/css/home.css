@@ -102,7 +102,7 @@ img {
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2));
     transition: var(--transition);
 }
 
@@ -281,6 +281,142 @@ img {
     display: none;
 }
 
+/* Nascondi checkbox */
+.nav-toggle {
+  display: none;
+}
+
+/* Hamburger stile minimal */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 28px;
+  height: 22px;
+  cursor: pointer;
+  z-index: 2000;
+}
+
+.hamburger .bar {
+  height: 3px;
+  width: 100%;
+  background-color: var(--light);
+  border-radius: 2px;
+  transition: all 0.35s ease;
+}
+
+/* Hamburger animazione X */
+.nav-toggle:checked + .hamburger .bar:nth-child(1) {
+  transform: rotate(45deg) translate(5px, 5px);
+}
+.nav-toggle:checked + .hamburger .bar:nth-child(2) {
+  opacity: 0;
+}
+.nav-toggle:checked + .hamburger .bar:nth-child(3) {
+  transform: rotate(-45deg) translate(5px, -5px);
+}
+
+/* Menu mobile - slide da destra */
+.mobile-nav {
+  position: fixed;
+  top: var(--header-height);
+  right: 0;
+  width: 280px;
+  height: calc(100% - var(--header-height));
+  background-color: rgba(15, 15, 15, 0.95);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  padding: 2rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  box-shadow: -3px 0 12px rgb(0, 0, 0);
+  transform: translateX(100%);
+  transition: transform 0.35s ease;
+  z-index: 1999;
+}
+
+/* Mostra menu se checked */
+.nav-toggle:checked ~ .mobile-nav {
+  transform: translateX(0);
+}
+
+/* Lista link */
+.mobile-nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.mobile-nav ul li {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.mobile-nav ul li a,
+.mobile-nav ul li form button.logout-button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 1rem;
+  font-size: 1.2rem;
+  color: var(--light);
+  text-decoration: none;
+  border-radius: var(--border-radius-sm);
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  width: 100%;
+  text-align: left;
+}
+
+.mobile-nav ul li a:hover,
+.mobile-nav ul li form button.logout-button:hover {
+  background-color: var(--accent);
+  color: var(--light);
+}
+
+/* Badge notifiche */
+.mobile-nav ul li a .badge {
+  margin-left: auto;
+  background-color: var(--accent);
+  padding: 3px 8px;
+  font-size: 0.85rem;
+  border-radius: 9999px;
+  color: var(--light);
+  font-weight: 700;
+}
+
+/* Bottone logout */
+.mobile-nav ul li form button.logout-button {
+  font-weight: 700;
+}
+
+/* Scrollbar personalizzata */
+.mobile-nav::-webkit-scrollbar {
+  width: 6px;
+}
+.mobile-nav::-webkit-scrollbar-thumb {
+  background-color: var(--accent);
+  border-radius: 3px;
+}
+
+/* Mostra hamburger solo su mobile */
+@media (max-width: 768px) {
+  .hamburger {
+    display: flex;
+  }
+  .nav {
+    display: none;
+  }
+}
+
+@media (min-width: 769px) {
+  .hamburger,
+  .mobile-nav {
+    display: none !important;
+  }
+}
 /* Profile Dropdown */
 .profile-dropdown {
     position: relative;
@@ -852,6 +988,7 @@ main.main-content {
         flex-direction: column;
         padding: 1rem 0;
         height: auto;
+        background-color: black;
     }
     
     .logo-container {

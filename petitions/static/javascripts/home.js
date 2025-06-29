@@ -49,3 +49,14 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
+document.addEventListener('DOMContentLoaded', () => {
+  const navToggle = document.getElementById('nav-toggle');
+  const mobileNav = document.querySelector('.mobile-nav');
+
+  mobileNav.querySelectorAll('a, button').forEach(el => {
+    el.addEventListener('click', () => {
+      // Chiudi menu al click
+      navToggle.checked = false;
+    });
+  });
+});
