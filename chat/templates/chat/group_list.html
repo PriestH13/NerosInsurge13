@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>I tuoi gruppi</title>
+</head>
+<body>
+    <h1>I tuoi gruppi</h1>
+    <a href="{% url 'chat:create_group' %}">Crea un nuovo gruppo</a>
+    <ul>
+        {% for group in groups %}
+            <li>
+                <a href="{% url 'chat:group_detail' group.group_id %}">{{ group.name }}</a>
+                {% if group.description %}
+                    ({{ group.description|truncatewords:10 }})
+                {% endif %}
+                {% if request.user.groupmembership_set.filter(group=group, is_admin=True).exists %}
+                    (Admin)
+                {% endif %}
+                - Creato da: <a href="{% url 'auth:profile' %}">{{ group.creator.username }}</a>
+            </li>
+        {% empty %}
+            <li>Nessun gruppo trovato.</li>
+        {% endfor %}
+    </ul>
+    <a href="{% url 'auth:profile' %}">Vai al tuo profilo</a>
+</body>
+</html>

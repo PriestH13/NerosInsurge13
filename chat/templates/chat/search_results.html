@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Risultati della ricerca</title>
+</head>
+<body>
+    <h1>Risultati per "{{ query }}"</h1>
+    <form method="get">
+        {{ form.as_p }}
+        <button type="submit">Cerca</button>
+    </form>
+    <h2>Utenti</h2>
+    <ul>
+        {% for user in users %}
+            <li>
+                {% if user.profile_picture %}
+                    <img src="{{ user.profile_picture.url }}" alt="Profile Picture" width="50">
+                {% endif %}
+                <a href="{% url 'auth:profile' %}">{{ user.username }}</a>
+                <p>{{ user.bio|default:"Nessuna bio" }}</p>
+                <form method="post" action="{% url 'chat:start_conversation' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="user_id" value="{{ user.user_id }}">
+                    <button type="submit">Inizia conversazione</button>
+                </form>
+            </li>
+        {% empty %}
+            <li>Nessun utente trovato.</li>
+        {% endfor %}
+    </ul>
+    <h2>Gruppi</h2>
+    <ul>
+        {% for group in groups %}
+            <li>
+                <a href="{% url 'chat:group_detail' group.group_id %}">{{ group.name }}</a>
+                <p>{{ group.description|default:"Nessuna descrizione" }}</p>
+            </li>
+        {% empty %}
+            <li>Nessun gruppo trovato.</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

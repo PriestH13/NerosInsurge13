@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Crea Gruppo</title>
+</head>
+<body>
+    <h1>Crea un nuovo gruppo</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Crea</button>
+    </form>
+    {% if form.errors %}
+        <p style="color: red;">{{ form.errors }}</p>
+    {% endif %}
+</body>
+</html>

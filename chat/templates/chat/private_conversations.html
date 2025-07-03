@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Conversazioni Private</title>
+</head>
+<body>
+    <h1>Le tue conversazioni private</h1>
+    <ul>
+        {% for conversation in conversations %}
+            <li>
+                <a href="{% url 'chat:private_conversation_detail' conversation.conversation_id %}">
+                    {% if conversation.participant1 == request.user %}
+                        {{ conversation.participant2.username }}
+                    {% else %}
+                        {{ conversation.participant1.username }}
+                    {% endif %}
+                    {% if conversation.messages.last %}
+                        (Ultimo messaggio: {{ conversation.messages.last.timestamp }})
+                    {% endif %}
+                </a>
+                <a href="{% url 'auth:profile' %}">
+                    Visualizza profilo
+                </a>
+            </li>
+        {% empty %}
+            <li>Nessuna conversazione trovata.</li>
+        {% endfor %}
+    </ul>
+    <a href="{% url 'chat:search_profiles_and_groups' %}">Cerca un utente per iniziare una nuova conversazione</a>
+</body>
+</html>

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ group.name }}</title>
+</head>
+<body>
+    <h1>{{ group.name }}</h1>
+    <p>{{ group.description|default:"Nessuna descrizione" }}</p>
+    <h3>Membri</h3>
+    <ul>
+        {% for member in group.members.all %}
+            <li>{{ member.username }}{% if member.groupmembership_set.filter(group=group, is_admin=True).exists %} (Admin){% endif %}</li>
+        {% empty %}
+            <li>Nessun membro</li>
+        {% endfor %}
+    </ul>
+    {% if request.user.groupmembership_set.filter(group=group, is_admin=True).exists %}
+        <h3>Aggiungi membro</h3>
+        <form method="post" action="{% url 'chat:add_group_member' group.group_id %}">
+            {% csrf_token %}
+            {{ member_form.as_p }}
+            <button type="submit">Aggiungi</button>
+        </form>
+        {% if member_form.errors %}
+            <p style="color: red;">{{ member_form.errors }}</p>
+        {% endif %}
+    {% endif %}
+    <h3>Messaggi</h3>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Invia</button>
+    </form>
+    {% if form.errors %}
+        <p style="color: red;">{{ form.errors }}</p>
+    {% endif %}
+    <ul>
+        {% for message in messages %}
+            <li>{{ message.sender.username }} ({{ message.timestamp }}): {{ message.content }}</li>
+        {% empty %}
+            <li>Nessun messaggio</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

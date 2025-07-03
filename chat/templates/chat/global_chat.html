@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat Globale</title>
+</head>
+<body>
+    <h1>Chat Globale</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Invia</button>
+    </form>
+    {% if form.errors %}
+        <p style="color: red;">{{ form.errors }}</p>
+    {% endif %}
+    <ul>
+        {% for message in messages %}
+            <li>{{ message.sender.username }} ({{ message.timestamp }}): {{ message.content }}</li>
+        {% empty %}
+            <li>Nessun messaggio</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
