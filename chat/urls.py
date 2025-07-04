@@ -5,6 +5,8 @@ app_name = 'chat'
 
 urlpatterns = [
     path('global/', views.GlobalChatView.as_view(), name='global_chat'),
+    path('api/global/messages/', views.GlobalMessagesAPI.as_view(), name='global_messages_api'),
+    path('api/global/send/', views.SendGlobalMessageAPI.as_view(), name='send_global_message_api'),
 
     path('conversations/', views.PrivateConversationsView.as_view(), name='private_conversations'),
     path('conversation/<uuid:conversation_id>/', views.PrivateConversationDetailView.as_view(), name='private_conversation_detail'),

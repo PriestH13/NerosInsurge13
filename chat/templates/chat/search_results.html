@@ -1,4 +1,11 @@
-<!DOCTYPE html>
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/report.css' %}">
+<link rel="stylesheet" href="{% static 'css/petition_detail.css' %}">
+<script src="{% static 'js/register.js' %}" defer></script>
+{% endblock %}
 <html>
 <head>
     <title>Risultati della ricerca</title>

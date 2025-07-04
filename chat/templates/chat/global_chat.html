@@ -1,24 +1,76 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Chat Globale</title>
-</head>
-<body>
-    <h1>Chat Globale</h1>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Invia</button>
-    </form>
-    {% if form.errors %}
-        <p style="color: red;">{{ form.errors }}</p>
-    {% endif %}
-    <ul>
-        {% for message in messages %}
-            <li>{{ message.sender.username }} ({{ message.timestamp }}): {{ message.content }}</li>
-        {% empty %}
-            <li>Nessun messaggio</li>
-        {% endfor %}
-    </ul>
-</body>
-</html>
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/group.css' %}">
+<script src="{% static 'javascripts/group.js' %}" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/emoji-picker-element@1.14.0/dist/index.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="chat-container">
+  <header class="chat-header">Chat Globale</header>
+
+  <div class="online-users" id="online-users">
+    Online: 
+    {% for user in online_users %}
+      <span class="online-user" title="{{ user.email|default:'No email' }}">
+        {% if user.profile_picture %}
+          <img src="{{ user.profile_picture.url }}" alt="{{ user.username }}" class="online-user-pic" onerror="this.src='{% static 'images/default_profile.png' %}'">
+        {% else %}
+          <img src="{% static 'images/default_profile.png' %}" alt="{{ user.username }}" class="online-user-pic">
+        {% endif %}
+        {{ user.username }}
+      </span>{% if not forloop.last %}, {% endif %}
+    {% empty %}
+      Nessun utente online
+    {% endfor %}
+  </div>
+
+  <div class="typing-indicator" id="typing-indicator"></div>
+
+  <section class="chat-messages" id="chat-messages" aria-live="polite" aria-relevant="additions">
+    {% for msg in messages %}
+      <article class="chat-message {% if msg.sender == request.user %}own{% else %}other{% endif %}" data-msg-id="{{ msg.id }}">
+        <div class="chat-meta">
+          <strong class="chat-user" title="{{ msg.sender.email|default:'No email' }}">
+            {% if msg.sender.profile_picture %}
+              <img src="{{ msg.sender.profile_picture.url }}" alt="{{ msg.sender.username }}" class="chat-user-pic" onerror="this.src='{% static 'images/default_profile.png' %}'">
+            {% else %}
+              <img src="{% static 'images/default_profile.png' %}" alt="{{ msg.sender.username }}" class="chat-user-pic">
+            {% endif %}
+            {{ msg.sender.username }}
+          </strong>
+          <time datetime="{{ msg.timestamp|date:'c' }}">
+            {{ msg.timestamp|date:"H:i" }}
+          </time>
+        </div>
+        <div class="chat-text">{{ msg.content|linebreaksbr }}</div>
+        {% if msg.sender != request.user %}
+          <button class="report-btn" aria-label="Segnala messaggio" data-msg-id="{{ msg.id }}">⚠️ Segnala</button>
+        {% endif %}
+      </article>
+    {% empty %}
+      <p>Nessun messaggio</p>
+    {% endfor %}
+  </section>
+
+  <form id="chat-form" autocomplete="off" aria-label="Invio messaggio">
+    {% csrf_token %}
+    <textarea name="content" id="message-input" rows="3" required></textarea>
+    <div class="chat-actions">
+      <div class="emoji-picker-container">
+        <button type="button" id="emoji-btn" aria-label="Aggiungi emoji">😊</button>
+        <emoji-picker class="emoji-picker" locale="it"></emoji-picker>
+      </div>
+      <button type="button" id="send-button">Invia</button>
+    </div>
+  </form>
+</div>
+
+<script>
+  const CURRENT_USERNAME = "{{ request.user.username }}";
+  const DEFAULT_PROFILE_PIC = "{% static 'images/default_profile.png' %}";
+  const CSRF_TOKEN = "{{ csrf_token }}";
+</script>
+{% endblock %}

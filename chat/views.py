@@ -2,7 +2,8 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import View, ListView, TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
-from django.http import HttpResponseBadRequest
+from django.http import HttpResponseBadRequest, JsonResponse
+import json
 from .models import GlobalChatMessage, PrivateConversation, PrivateMessage, Group, GroupMembership, GroupMessage
 from auth_users.models import User
 from .forms import GlobalChatMessageForm, PrivateMessageForm, GroupForm, GroupMessageForm, AddGroupMemberForm, SearchForm
@@ -12,16 +13,71 @@ class GlobalChatView(LoginRequiredMixin, View):
 
     def get(self, request, *args, **kwargs):
         form = GlobalChatMessageForm()
-        messages = GlobalChatMessage.objects.all().order_by('timestamp')[:50]
-        return render(request, self.template_name, {'form': form, 'messages': messages})
+        messages = GlobalChatMessage.objects.all().order_by('-timestamp')[:50]
+        return render(request, self.template_name, {
+            'form': form,
+            'messages': reversed(messages),  # Show oldest first
+        })
 
     def post(self, request, *args, **kwargs):
         form = GlobalChatMessageForm(request.POST)
         if form.is_valid():
-            GlobalChatMessage.objects.create(sender=request.user, **form.cleaned_data)
+            GlobalChatMessage.objects.create(
+                sender=request.user,
+                content=form.cleaned_data['content']
+            )
             return redirect('chat:global_chat')
-        messages = GlobalChatMessage.objects.all().order_by('timestamp')[:50]
-        return render(request, self.template_name, {'form': form, 'messages': messages})
+        messages = GlobalChatMessage.objects.all().order_by('-timestamp')[:50]
+        return render(request, self.template_name, {
+            'form': form,
+            'messages': reversed(messages),
+        })
+
+class GlobalMessagesAPI(LoginRequiredMixin, View):
+    def get(self, request, *args, **kwargs):
+        messages = GlobalChatMessage.objects.all().order_by('-timestamp')[:50]
+        data = [{
+            'id': msg.id,
+            'sender': {
+                'username': msg.sender.username,
+                'profile_picture': msg.sender.profile_picture.url if hasattr(msg.sender, 'profile_picture') and msg.sender.profile_picture else '/static/images/default_profile.png'
+            },
+            'content': msg.content,
+            'timestamp': msg.timestamp.strftime("%H:%M"),
+            'is_own': msg.sender == request.user
+        } for msg in reversed(messages)]  # Oldest first
+        
+        return JsonResponse(data, safe=False)
+
+class SendGlobalMessageAPI(LoginRequiredMixin, View):
+    def post(self, request, *args, **kwargs):
+        try:
+            data = json.loads(request.body)
+            content = data.get('content', '').strip()
+            
+            if not content:
+                return JsonResponse({'status': 'error', 'message': 'Message cannot be empty'}, status=400)
+                
+            message = GlobalChatMessage.objects.create(
+                sender=request.user,
+                content=content
+            )
+            
+            return JsonResponse({
+                'status': 'success',
+                'message': {
+                    'id': message.id,
+                    'sender': {
+                        'username': request.user.username,
+                        'profile_picture': request.user.profile_picture.url if hasattr(request.user, 'profile_picture') and request.user.profile_picture else '/static/images/default_profile.png'
+                    },
+                    'content': message.content,
+                    'timestamp': message.timestamp.strftime("%H:%M")
+                }
+            })
+            
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
 
 class PrivateConversationsView(LoginRequiredMixin, ListView):
     model = PrivateConversation
