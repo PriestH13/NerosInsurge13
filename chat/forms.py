@@ -13,9 +13,18 @@ class GlobalChatMessageForm(forms.ModelForm):
 class PrivateMessageForm(forms.ModelForm):
     class Meta:
         model = PrivateMessage
-        fields = ['content']
+        fields = ['content', 'image']
         widgets = {
-            'content': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Scrivi un messaggio...'}),
+            'content': forms.Textarea(attrs={
+                'rows': 3,
+                'placeholder': 'Scrivi un messaggio...',
+                'id': 'message-content',
+            }),
+            'image': forms.ClearableFileInput(attrs={
+                'accept': 'image/*',
+                'id': 'message-image',
+                'style': 'margin-top: 0.5rem;',
+            }),
         }
 
 class GroupForm(forms.ModelForm):

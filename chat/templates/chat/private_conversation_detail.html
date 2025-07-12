@@ -1,57 +1,208 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 {% load static %}
+{% load tz %}
 
 {% block extra_head %}
-<link rel="stylesheet" href="{% static 'css/report.css' %}">
-<link rel="stylesheet" href="{% static 'css/petition_detail.css' %}">
-<script src="{% static 'js/register.js' %}" defer></script>
+    <link rel="stylesheet" href="{% static 'css/persona.css' %}">
+    <script src="{% static 'js/persona.js' %}" defer></script>
 {% endblock %}
-<html>
-<head>
-    <title>{{ group.name }}</title>
-</head>
-<body>
-    <h1>{{ group.name }}</h1>
-    <p>{{ group.description|default:"Nessuna descrizione" }}</p>
-    <h3>Membri</h3>
-    <ul>
-        {% for member in group.members.all %}
-            <li>
-                <a href="{% url 'auth:profile' %}">{{ member.username }}</a>
-                {% if member.groupmembership_set.filter(group=group, is_admin=True).exists %} (Admin) {% endif %}
-            </li>
-        {% empty %}
-            <li>Nessun membro</li>
-        {% endfor %}
-    </ul>
-    {% if request.user.groupmembership_set.filter(group=group, is_admin=True).exists %}
-        <h3>Aggiungi membro</h3>
-        <form method="post" action="{% url 'chat:add_group_member' group.group_id %}">
+
+{% block content %}
+    <div class="container">
+        <!-- Intestazione con dettagli avanzati della conversazione -->
+        <header class="conversation-header">
+            <div class="participant-info">
+                <h1>
+                    Conversazione con 
+                    {% if conversation.participant1 == request.user %}
+                        {{ conversation.participant2.username }}
+                    {% else %}
+                        {{ conversation.participant1.username }}
+                    {% endif %}
+                </h1>
+                <div class="user-status">
+                    <span class="status-indicator online"></span>
+                    <span>Online</span>
+                </div>
+            </div>
+            
+            <div class="conversation-meta">
+                <div class="conversation-details">
+                    <span class="conversation-id">ID: {{ conversation.conversation_id }}</span>
+                    <span class="conversation-date">Iniziata il {{ conversation.created_at|timezone:"Europe/Rome"|date:"d/m/Y H:i" }}</span>
+                    <span class="message-count">Messaggi: {{ messages|length }}</span>
+                </div>
+                
+                <div class="conversation-actions">
+                    <button class="btn btn-icon" title="Cerca nella conversazione">
+                        <i class="fas fa-search"></i>
+                    </button>
+                    <button class="btn btn-icon" title="Opzioni">
+                        <i class="fas fa-ellipsis-v"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Area dei messaggi con scroll -->
+        <div id="messages" class="messages-container">
+            {% for message in messages %}
+                <div class="message {% if message.sender == request.user %}sent{% else %}received{% endif %}" 
+                     data-message-id="{{ message.message_id }}"
+                     data-sender-id="{{ message.sender.id }}">
+                    <div class="message-content">
+                        <div class="message-header">
+                            <strong>{{ message.sender.username }}</strong>
+                            <div class="message-status">
+                                {% if message.is_edited %}
+                                    <span class="edited-indicator" title="Modificato">
+                                        <i class="fas fa-pencil-alt"></i>
+                                    </span>
+                                {% endif %}
+                                {% if message.is_read and message.sender == request.user %}
+                                    <span class="read-indicator" title="Letto">
+                                        <i class="fas fa-check-double"></i>
+                                    </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        {% if message.image %}
+                            <div class="message-image">
+                                <img src="{{ message.image.url }}" alt="Immagine inviata" style="max-width: 250px; border-radius: 8px; margin-bottom: 6px;">
+                            </div>
+                        {% endif %}
+                        
+                        <p class="message-text">{{ message.content }}</p>
+                        
+                        <div class="message-footer">
+                            <small class="message-timestamp" title="{{ message.timestamp|timezone:"Europe/Rome"|date:"d/m/Y H:i:s" }}">
+                                {{ message.timestamp|timezone:"Europe/Rome"|date:"H:i" }}
+                            </small>
+                            
+                            {% if message.sender == request.user %}
+                                <div class="message-actions">
+                                    <button class="btn-message-action edit-btn" title="Modifica">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn-message-action delete-btn" title="Elimina">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="no-messages">
+                    <i class="fas fa-comments"></i>
+                    <p>Nessun messaggio in questa conversazione. Inizia a chattare!</p>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Form per inviare messaggi con opzioni avanzate -->
+        <form method="post" id="message-form" class="message-form" 
+              action="{% url 'chat:private_conversation_detail' conversation.conversation_id %}"
+              enctype="multipart/form-data">  <!-- enctype aggiunto -->
             {% csrf_token %}
-            {{ member_form.as_p }}
-            <button type="submit">Aggiungi</button>
+            <div class="form-group">
+                <textarea name="content" id="message-content" rows="3" 
+                          placeholder="Scrivi un messaggio..."></textarea>
+
+                <!-- input file nascosto -->
+                <input type="file" name="image" id="message-image" accept="image/*" style="display:none;">
+
+                <div class="form-actions">
+                    <div class="message-tools">
+                        <button type="button" class="btn-tool" id="attach-image-btn" title="Allega immagine">
+                            <i class="fas fa-paperclip"></i>
+                        </button>
+                        <button type="button" class="btn-tool" title="Emoji">
+                            <i class="far fa-smile"></i>
+                        </button>
+                    </div>
+                    <button type="submit" class="send-button" disabled>
+                        <i class="fas fa-paper-plane"></i> Invia
+                    </button>
+                </div>
+            </div>
         </form>
-        {% if member_form.errors %}
-            <p style="color: red;">{{ member_form.errors }}</p>
-        {% endif %}
-    {% endif %}
-    <h3>Messaggi</h3>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Invia</button>
-    </form>
-    {% if form.errors %}
-        <p style="color: red;">{{ form.errors }}</p>
-    {% endif %}
-    <ul>
-        {% for message in messages %}
-            <li>
-                <a href="{% url 'auth:profile' %}">{{ message.sender.username }}</a> ({{ message.timestamp }}): {{ message.content }}
-            </li>
-        {% empty %}
-            <li>Nessun messaggio</li>
-        {% endfor %}
-    </ul>
-</body>
-</html>
+    </div>
+
+    <!-- Modale per la modifica del messaggio -->
+    <div id="edit-message-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h3>Modifica messaggio</h3>
+            <form id="edit-message-form">
+                {% csrf_token %}
+                <input type="hidden" id="edit-message-id">
+                <textarea id="edit-message-content" rows="3" required></textarea>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-cancel">Annulla</button>
+                    <button type="submit" class="btn btn-primary">Salva modifiche</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- JavaScript avanzato -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const messageForm = document.getElementById('message-form');
+            const messageInput = document.getElementById('message-content');
+            const sendButton = document.querySelector('.send-button');
+            const attachImageBtn = document.getElementById('attach-image-btn');
+            const messageImageInput = document.getElementById('message-image');
+
+            // Apri file picker cliccando sul bottone
+            attachImageBtn.addEventListener('click', () => {
+                messageImageInput.click();
+            });
+
+            // Abilita il pulsante invia se c'è testo o immagine
+            function checkSendButton() {
+                sendButton.disabled = !(messageInput.value.trim() || messageImageInput.files.length > 0);
+            }
+
+            messageInput.addEventListener('input', checkSendButton);
+            messageImageInput.addEventListener('change', checkSendButton);
+
+            // Inizializza stato bottone
+            checkSendButton();
+
+            // Scroll automatico messaggi
+            const messagesContainer = document.getElementById('messages');
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+            // Gestione modifica messaggio (rimane invariato)
+            document.querySelectorAll('.edit-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const messageElement = e.target.closest('.message');
+                    const messageId = messageElement.dataset.messageId;
+                    const messageContent = messageElement.querySelector('.message-text').textContent;
+                    
+                    document.getElementById('edit-message-id').value = messageId;
+                    document.getElementById('edit-message-content').value = messageContent;
+                    document.getElementById('edit-message-modal').style.display = 'block';
+                });
+            });
+
+            document.querySelector('.close-modal, .btn-cancel').addEventListener('click', () => {
+                document.getElementById('edit-message-modal').style.display = 'none';
+            });
+
+            document.getElementById('edit-message-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                // Logica modifica da implementare
+            });
+
+            // Aggiornamento messaggi in tempo reale (placeholder)
+            function setupRealTimeUpdates() {
+                // Logica da implementare
+            }
+            setupRealTimeUpdates();
+        });
+    </script>
+{% endblock %}

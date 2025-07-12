@@ -33,7 +33,7 @@ INSTALLED_APPS = [
     'channels',
 ]
 
-ASGI_APPLICATION = 'nerostime13.asgi.application'
+ASGI_APPLICATION = 'nerosinsurge13.asgi.application' 
 
 CHANNEL_LAYERS = {
     "default": {

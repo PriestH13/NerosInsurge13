@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils import timezone
+from django.core.exceptions import ValidationError
 import uuid
 from auth_users.models import User
 
@@ -26,10 +27,16 @@ class PrivateConversation(models.Model):
     created_at = models.DateTimeField(default=timezone.now)
 
     class Meta:
-        unique_together = ['participant1', 'participant2']  # Evita conversazioni duplicate
+        unique_together = ['participant1', 'participant2']
         indexes = [
             models.Index(fields=['participant1', 'participant2']),
+            models.Index(fields=['participant2', 'participant1']),
         ]
+
+    def save(self, *args, **kwargs):
+        if self.participant1.id > self.participant2.id:
+            self.participant1, self.participant2 = self.participant2, self.participant1
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"Conversation between {self.participant1.username} and {self.participant2.username}"
@@ -38,7 +45,8 @@ class PrivateMessage(models.Model):
     message_id = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
     conversation = models.ForeignKey(PrivateConversation, on_delete=models.CASCADE, related_name='messages')
     sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='private_messages')
-    content = models.TextField(max_length=2000)
+    content = models.TextField(max_length=2000, blank=True)  # ora può essere anche vuoto
+    image = models.ImageField(upload_to='private_messages/images/', blank=True, null=True)  # nuovo campo immagine
     timestamp = models.DateTimeField(default=timezone.now)
     is_read = models.BooleanField(default=False)
     is_edited = models.BooleanField(default=False)
@@ -49,10 +57,13 @@ class PrivateMessage(models.Model):
             models.Index(fields=['conversation', 'timestamp']),
         ]
 
-    def __str__(self):
-        return f"{self.sender.username} in {self.conversation}: {self.content[:50]}..."
+    def clean(self):
+        if not self.content.strip() and not self.image:
+            raise ValidationError("Il messaggio deve contenere testo o un'immagine.")
 
-# Modello per i gruppi
+    def __str__(self):
+        preview = self.content[:50] if self.content else "Immagine"
+        return f"{self.sender.username} in {self.conversation}: {preview}..."
 class Group(models.Model):
     group_id = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
     name = models.CharField(max_length=100)

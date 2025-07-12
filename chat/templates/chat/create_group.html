@@ -5,19 +5,19 @@
 <link rel="stylesheet" href="{% static 'css/report.css' %}">
 <link rel="stylesheet" href="{% static 'css/petition_detail.css' %}">
 <script src="{% static 'js/register.js' %}" defer></script>
-{% endblock %}<html>
-<head>
-    <title>Crea Gruppo</title>
-</head>
-<body>
-    <h1>Crea un nuovo gruppo</h1>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Crea</button>
-    </form>
-    {% if form.errors %}
-        <p style="color: red;">{{ form.errors }}</p>
-    {% endif %}
-</body>
-</html>
+<title>Crea Gruppo</title>
+{% endblock %}
+
+{% block content %}
+<main class="group-create-container">
+  <h1>Crea un nuovo gruppo</h1>
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Crea</button>
+  </form>
+  {% if form.errors %}
+    <p class="form-error" style="color: red;">{{ form.errors }}</p>
+  {% endif %}
+</main>
+{% endblock %}

@@ -7,7 +7,7 @@ import json
 from .models import GlobalChatMessage, PrivateConversation, PrivateMessage, Group, GroupMembership, GroupMessage
 from auth_users.models import User
 from .forms import GlobalChatMessageForm, PrivateMessageForm, GroupForm, GroupMessageForm, AddGroupMemberForm, SearchForm
-
+from petitions.models import Notification
 class GlobalChatView(LoginRequiredMixin, View):
     template_name = 'chat/global_chat.html'
 
@@ -89,6 +89,18 @@ class PrivateConversationsView(LoginRequiredMixin, ListView):
             Q(participant1=self.request.user) | Q(participant2=self.request.user)
         ).order_by('-created_at')
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['conversations'] = [
+            {
+                'conversation': conv,
+                'unread_count': conv.messages.filter(is_read=False).exclude(sender=self.request.user).count(),
+                'other_participant': conv.participant1 if conv.participant2 == self.request.user else conv.participant2
+            }
+            for conv in self.get_queryset()
+        ]
+        return context
+
 class PrivateConversationDetailView(LoginRequiredMixin, View):
     template_name = 'chat/private_conversation_detail.html'
 
@@ -96,21 +108,83 @@ class PrivateConversationDetailView(LoginRequiredMixin, View):
         conversation = get_object_or_404(PrivateConversation, conversation_id=conversation_id)
         if request.user not in [conversation.participant1, conversation.participant2]:
             return HttpResponseBadRequest("Non autorizzato")
+        
+        # API: restituisci messaggi in formato JSON se ?format=json
+        if request.GET.get('format') == 'json':
+            messages = conversation.messages.all().order_by('timestamp')
+            messages.exclude(sender=request.user).update(is_read=True)
+            data = [{
+                'id': str(msg.message_id),
+                'sender': {
+                    'username': msg.sender.username,
+                    'profile_picture': msg.sender.profile_picture.url if hasattr(msg.sender, 'profile_picture') and msg.sender.profile_picture else '/static/images/default_profile.png'
+                },
+                'content': msg.content,
+                'timestamp': msg.timestamp.strftime("%H:%M"),
+                'is_own': msg.sender == request.user,
+                'is_read': msg.is_read
+            } for msg in messages]
+            return JsonResponse(data, safe=False)
+
+        # Rendering del template
         messages = conversation.messages.all().order_by('timestamp')
-        messages.filter(sender__ne=request.user).update(is_read=True)
+        messages.exclude(sender=request.user).update(is_read=True)
         form = PrivateMessageForm()
-        return render(request, self.template_name, {'conversation': conversation, 'messages': messages, 'form': form})
+        return render(request, self.template_name, {
+            'conversation': conversation,
+            'messages': messages,
+            'form': form
+        })
 
     def post(self, request, conversation_id, *args, **kwargs):
         conversation = get_object_or_404(PrivateConversation, conversation_id=conversation_id)
         if request.user not in [conversation.participant1, conversation.participant2]:
             return HttpResponseBadRequest("Non autorizzato")
+        
+        # API: gestisci invio messaggio tramite JSON
+        if request.content_type == 'application/json':
+            try:
+                data = json.loads(request.body)
+                content = data.get('content', '').strip()
+                if not content:
+                    return JsonResponse({'status': 'error', 'message': 'Il messaggio non può essere vuoto'}, status=400)
+                message = PrivateMessage.objects.create(
+                    conversation=conversation,
+                    sender=request.user,
+                    content=content
+                )
+                return JsonResponse({
+                    'status': 'success',
+                    'message': {
+                        'id': str(message.message_id),
+                        'sender': {
+                            'username': request.user.username,
+                            'profile_picture': request.user.profile_picture.url if hasattr(request.user, 'profile_picture') and request.user.profile_picture else '/static/images/default_profile.png'
+                        },
+                        'content': message.content,
+                        'timestamp': message.timestamp.strftime("%H:%M"),
+                        'is_own': True,
+                        'is_read': message.is_read
+                    }
+                })
+            except Exception as e:
+                return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+
+        # Form HTML
         form = PrivateMessageForm(request.POST)
         if form.is_valid():
-            PrivateMessage.objects.create(conversation=conversation, sender=request.user, **form.cleaned_data)
+            PrivateMessage.objects.create(
+                conversation=conversation,
+                sender=request.user,
+                **form.cleaned_data
+            )
             return redirect('chat:private_conversation_detail', conversation_id=conversation_id)
         messages = conversation.messages.all().order_by('timestamp')
-        return render(request, self.template_name, {'conversation': conversation, 'messages': messages, 'form': form})
+        return render(request, self.template_name, {
+            'conversation': conversation,
+            'messages': messages,
+            'form': form
+        })
 
 # Lista dei gruppi
 class GroupListView(LoginRequiredMixin, ListView):
@@ -145,14 +219,25 @@ class GroupDetailView(LoginRequiredMixin, View):
         group = get_object_or_404(Group, group_id=group_id)
         if request.user not in group.members.all():
             return HttpResponseBadRequest("Non sei membro di questo gruppo")
+
         messages = group.messages.all().order_by('timestamp')
         form = GroupMessageForm()
         member_form = AddGroupMemberForm(queryset=User.objects.exclude(id__in=group.members.all()).exclude(id=request.user.id))
+
+        # Calcola la mappa {member_id: is_admin}
+        members = group.members.all()
+        admin_map = {
+            member.id: GroupMembership.objects.filter(group=group, user=member, is_admin=True).exists()
+            for member in members
+        }
+
         return render(request, self.template_name, {
             'group': group,
             'messages': messages,
             'form': form,
-            'member_form': member_form
+            'member_form': member_form,
+            'members': members,
+            'admin_map': admin_map,
         })
 
     def post(self, request, group_id, *args, **kwargs):
@@ -204,11 +289,12 @@ class SearchProfilesAndGroupsView(LoginRequiredMixin, TemplateView):
             context['users'] = User.objects.none()
             context['groups'] = Group.objects.none()
         return context
-
 class StartConversationView(LoginRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         user_id = request.POST.get('user_id')
-        other_user = get_object_or_404(User, user_id=user_id)
+        if not user_id:
+            return HttpResponseBadRequest("user_id mancante o vuoto")
+        other_user = get_object_or_404(User, id=user_id)
         if other_user == request.user:
             return HttpResponseBadRequest("Non puoi iniziare una conversazione con te stesso")
         conversation = PrivateConversation.objects.filter(
@@ -216,5 +302,9 @@ class StartConversationView(LoginRequiredMixin, View):
             Q(participant1=other_user, participant2=request.user)
         ).first()
         if not conversation:
-            conversation = PrivateConversation.objects.create(participant1=request.user, participant2=other_user)
+            conversation = PrivateConversation.objects.create(
+                participant1=request.user,
+                participant2=other_user
+            )
         return redirect('chat:private_conversation_detail', conversation_id=conversation.conversation_id)
+

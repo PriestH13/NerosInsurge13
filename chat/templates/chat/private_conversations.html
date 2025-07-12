@@ -1,38 +1,113 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 {% load static %}
-
 {% block extra_head %}
-<link rel="stylesheet" href="{% static 'css/report.css' %}">
-<link rel="stylesheet" href="{% static 'css/petition_detail.css' %}">
-<script src="{% static 'js/register.js' %}" defer></script>
+    <link rel="stylesheet" href="{% static 'css/persona.css' %}">
+    <script src="{% static 'js/persona.js' %}" defer></script>
 {% endblock %}
-<html>
-<head>
-    <title>Conversazioni Private</title>
-</head>
-<body>
-    <h1>Le tue conversazioni private</h1>
-    <ul>
-        {% for conversation in conversations %}
-            <li>
-                <a href="{% url 'chat:private_conversation_detail' conversation.conversation_id %}">
-                    {% if conversation.participant1 == request.user %}
-                        {{ conversation.participant2.username }}
-                    {% else %}
-                        {{ conversation.participant1.username }}
-                    {% endif %}
-                    {% if conversation.messages.last %}
-                        (Ultimo messaggio: {{ conversation.messages.last.timestamp }})
-                    {% endif %}
-                </a>
-                <a href="{% url 'auth:profile' %}">
-                    Visualizza profilo
-                </a>
-            </li>
-        {% empty %}
-            <li>Nessuna conversazione trovata.</li>
-        {% endfor %}
-    </ul>
-    <a href="{% url 'chat:search_profiles_and_groups' %}">Cerca un utente per iniziare una nuova conversazione</a>
-</body>
-</html>
+{% block page_content %}{% endblock %} 
+{% block global_search %}{% endblock %}
+{% block content %}
+    <div class="container">
+        <h1>Le tue conversazioni</h1>
+        
+        <!-- Messaggio se non ci sono conversazioni -->
+        {% if not conversations %}
+            <p class="no-conversations">Nessuna conversazione trovata. Inizia una nuova conversazione qui sotto!</p>
+        {% else %}
+            <!-- Elenco delle conversazioni -->
+            <ul class="conversations-list">
+                {% for item in conversations %}
+                    <li class="conversation-item">
+                        <a href="{% url 'chat:private_conversation_detail' item.conversation.conversation_id %}" class="conversation-link">
+                            <div class="conversation-info">
+                                <span class="username">{{ item.other_participant.username }}</span>
+                                {% if item.unread_count > 0 %}
+                                    <span class="unread-count">{{ item.unread_count }} nuovi</span>
+                                {% endif %}
+                                <span class="created-at">Iniziata il {{ item.conversation.created_at|date:"d/m/Y H:i" }}</span>
+                            </div>
+                            <!-- Anteprima dell'ultimo messaggio -->
+                            {% with last_message=item.conversation.messages.last %}
+                                {% if last_message %}
+                                    <p class="last-message">
+                                        <strong>{{ last_message.sender.username }}:</strong>
+                                        {{ last_message.content|truncatechars:50 }}
+                                        {% if last_message.is_edited %}
+                                            <span class="edited-indicator">(modificato)</span>
+                                        {% endif %}
+                                    </p>
+                                {% else %}
+                                    <p class="last-message">Nessun messaggio ancora</p>
+                                {% endif %}
+                            {% endwith %}
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+
+        <!-- Form per iniziare una nuova conversazione -->
+        <form id="start-conversation-form" method="post" action="{% url 'chat:start_conversation' %}" class="start-conversation-form">
+            {% csrf_token %}
+            <div class="search-container">
+                <input type="text" id="user-search" placeholder="Cerca un utente per username..." autocomplete="off">
+                <input type="hidden" name="user_id" id="user-id">
+                <div id="search-results" class="search-results"></div>
+            </div>
+            <button type="submit" id="start-conversation-btn" disabled>Inizia conversazione</button>
+        </form>
+    </div>
+
+    <!-- JavaScript per la ricerca utenti in tempo reale -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const searchInput = document.getElementById('user-search');
+            const userIdInput = document.getElementById('user-id');
+            const searchResults = document.getElementById('search-results');
+            const startButton = document.getElementById('start-conversation-btn');
+
+            searchInput.addEventListener('input', async () => {
+                const query = searchInput.value.trim();
+                if (query.length < 2) {
+                    searchResults.innerHTML = '';
+                    startButton.disabled = true;
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`/chat/search-users/?query=${encodeURIComponent(query)}`);
+                    if (!response.ok) throw new Error('Errore nella ricerca');
+                    const users = await response.json();
+                    searchResults.innerHTML = users.map(user => `
+                        <div class="search-result-item" data-user-id="${user.id}">
+                            <span>${user.username}</span>
+                            ${user.bio ? `<small>${user.bio}</small>` : ''}
+                        </div>
+                    `).join('');
+                } catch (error) {
+                    console.error('Errore nella ricerca utenti:', error);
+                    searchResults.innerHTML = '<p>Errore nella ricerca</p>';
+                }
+            });
+
+            searchResults.addEventListener('click', (e) => {
+                const item = e.target.closest('.search-result-item');
+                if (item) {
+                    const userId = item.dataset.userId;
+                    userIdInput.value = userId;
+                    searchInput.value = item.querySelector('span').textContent;
+                    searchResults.innerHTML = '';
+                    startButton.disabled = false;
+                }
+            });
+
+            // Previeni invio del form se user_id è vuoto
+            document.getElementById('start-conversation-form').addEventListener('submit', (e) => {
+                if (!userIdInput.value) {
+                    e.preventDefault();
+                    alert('Seleziona un utente dalla lista');
+                }
+            });
+        });
+    </script>
+{% endblock %}
