@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+
 {% block extra_head %}
 <link rel="stylesheet" href="{% static 'css/notification.css' %}">
 <script>
@@ -9,30 +10,29 @@
 {% endblock %}
 
 {% block content %}
-<!-- Dati delle notifiche in formato JSON per il JS -->
 <script id="notifications-data" type="application/json">
-  [
-    {% for notif in notifications %}
-    {
-      "id": {{ notif.id|safe }},
-      "message": "{{ notif.message|escapejs }}",
-      "link": "{{ notif.link|default:''|escapejs }}",
-      "is_read": {{ notif.is_read|lower }},
-      "created_at": "{{ notif.created_at|date:'c' }}"
-    }{% if not forloop.last %},{% endif %}
-    {% empty %}
-    []
-    {% endfor %}
-  ]
+[
+  {% for notif in notifications %}
+  {
+    "id": {{ notif.id }},
+    "message": "{{ notif.message|escapejs }}",
+    "link": "{{ notif.link|default:''|escapejs }}",
+    "is_read": {{ notif.is_read|yesno:"true,false" }},
+    "type": "{{ notif.notification_type|escapejs }}",
+    "created_at": "{{ notif.created_at|date:'c' }}"
+  }{% if not forloop.last %},{% endif %}
+  {% empty %}
+  []
+  {% endfor %}
+]
 </script>
 
-<!-- Header delle notifiche con badge e filtri -->
 <div class="notification-header">
   <h2>Le tue notifiche</h2>
   <div id="notification-container">
     <i id="notification-bell" class="fas fa-bell {% if unread_notifications_count > 0 %}has-notifications{% endif %}"></i>
     {% if unread_notifications_count > 0 %}
-      <span id="unread-count" class="unread-count">{{ unread_notifications_count }}</span>
+    <span id="unread-count" class="unread-count">{{ unread_notifications_count }}</span>
     {% endif %}
   </div>
   <div class="notification-filters">
@@ -40,6 +40,15 @@
       <option value="all">Tutte</option>
       <option value="unread">Non lette</option>
       <option value="read">Lette</option>
+    </select>
+    <select id="filter-type" class="filter-select">
+      <option value="all">Tutti i tipi</option>
+      <option value="chat_message">Messaggi Chat</option>
+      <option value="petition_comment">Commenti Petizione</option>
+      <option value="petition_vote">Voti Petizione</option>
+      <option value="petition_signature">Firme Petizione</option>
+      <option value="petition_update">Aggiornamenti</option>
+      <option value="report">Segnalazioni</option>
     </select>
     <select id="sort-order" class="filter-select">
       <option value="recent">Più recenti</option>
@@ -49,17 +58,34 @@
   </div>
 </div>
 
-<!-- Lista delle notifiche -->
 <ul id="notifications-list" class="notification-list">
-  <!-- Popolata dinamicamente dal JS -->
+  {% for notif in notifications %}
+    <li class="notification-item {% if not notif.is_read %}unread{% endif %}">
+      <a href="{% url 'petitions:go_to_notification' notif.id %}">
+        {% if notif.notification_type == 'chat_message' %}
+          <i class="fas fa-comment"></i>
+        {% elif notif.notification_type == 'petition_comment' %}
+          <i class="fas fa-comments"></i>
+        {% elif notif.notification_type == 'petition_vote' %}
+          <i class="fas fa-thumbs-up"></i>
+        {% elif notif.notification_type == 'petition_signature' %}
+          <i class="fas fa-pen-nib"></i>
+        {% elif notif.notification_type == 'petition_update' %}
+          <i class="fas fa-sync-alt"></i>
+        {% elif notif.notification_type == 'report' %}
+          <i class="fas fa-flag"></i>
+        {% else %}
+          <i class="fas fa-info-circle"></i>
+        {% endif %}
+        <span class="message">{{ notif.message }}</span>
+        <span class="timestamp">{{ notif.created_at|timesince }} fa</span>
+      </a>
+    </li>
+  {% empty %}
+    <p class="no-notifications">Non hai notifiche al momento.</p>
+  {% endfor %}
 </ul>
 
-<!-- Messaggio se non ci sono notifiche -->
-{% if not notifications %}
-  <p class="no-notifications">Non hai notifiche al momento.</p>
-{% endif %}
-
-<!-- Paginazione (se usi paginate_by) -->
 {% if is_paginated %}
   <div class="pagination">
     {% if page_obj.has_previous %}
@@ -70,6 +96,5 @@
       <a href="?page={{ page_obj.next_page_number }}" class="pagination-link">Successiva</a>
     {% endif %}
   </div>
-  
 {% endif %}
 {% endblock %}

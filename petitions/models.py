@@ -134,10 +134,21 @@ class Report(models.Model):
 
 #NOTIFICA
 class Notification(models.Model):
+    NOTIF_TYPE_CHOICES = (
+        ('petition_comment', 'Commento Petizione'),
+        ('chat_message', 'Messaggio Chat'),
+        ('petition_vote', 'Voto Petizione'),
+        ('petition_signature', 'Firma Petizione'),
+        ('petition_update', 'Aggiornamento Petizione'),
+        ('report', 'Segnalazione'),
+
+    )
+
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='notifications')
     message = models.CharField(max_length=255)
-    link = models.URLField(blank=True, null=True)  # link opzionale a petizione o altro
+    link = models.URLField(blank=True, null=True)
     is_read = models.BooleanField(default=False)
+    notification_type = models.CharField(max_length=30, choices=NOTIF_TYPE_CHOICES)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

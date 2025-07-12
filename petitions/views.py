@@ -408,7 +408,17 @@ def mark_notification_read(request, pk):
         return JsonResponse({'status': 'ok'})
     except Notification.DoesNotExist:
         return JsonResponse({'status': 'not_found'}, status=404)
-    
+
+@login_required
+def go_to_notification(request, pk):
+    notif = get_object_or_404(Notification, pk=pk, user=request.user)
+    if not notif.is_read:
+        notif.is_read = True
+        notif.save()
+    if notif.link:
+        return redirect(notif.link)
+    else:
+        return redirect('petitions:notification_list')
 
 @method_decorator(staff_member_required, name='dispatch')
 class ModerationActionCreateView(CreateView):

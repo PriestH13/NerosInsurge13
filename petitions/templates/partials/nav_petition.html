@@ -73,12 +73,31 @@
         {% if user.is_staff or user.is_superuser %}
         <li><a href="{% url 'admin:index' %}"><i class="fas fa-cogs"></i> Admin Dashboard</a></li>
         {% endif %}
-        <li><a href="{% url 'petitions:notification_list' %}">
-          <i class="fas fa-bell"></i> Notifiche
-          {% if unread_notifications_count > 0 %}
-          <span class="badge">{{ unread_notifications_count }}</span>
-          {% endif %}
-        </a></li>
+<a href="{% url 'petitions:notification_list' %}" class="nav-link notification-link" id="notification-bell-link" title="Notifiche">
+  <i class="fas fa-bell"></i>
+  {% if unread_notifications_count > 0 %}
+  <span class="badge">{{ unread_notifications_count }}</span>
+  {% endif %}
+</a>
+
+<div class="notifications-dropdown" aria-labelledby="notification-bell-link" role="menu">
+  {% if notifications %}
+    <ul class="notifications-list">
+      {% for notif in notifications %}
+        <li class="notification-item {% if not notif.is_read %}unread{% endif %}">
+          <a href="{{ notif.link|default:'#' }}" class="notification-link">
+            <span class="notification-message">{{ notif.message }}</span>
+            <small class="notification-time">{{ notif.created_at|timesince }} fa</small>
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+    <a href="{% url 'petitions:notification_list' %}" class="view-all">Vedi tutte le notifiche</a>
+  {% else %}
+    <p class="no-notifications">Nessuna notifica.</p>
+  {% endif %}
+</div>
+
         <li>
           <form method="post" action="{% url 'auth:logout' %}" style="margin:0;">
             {% csrf_token %}

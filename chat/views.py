@@ -308,3 +308,13 @@ class StartConversationView(LoginRequiredMixin, View):
             )
         return redirect('chat:private_conversation_detail', conversation_id=conversation.conversation_id)
 
+
+def create_chat_notification(message):
+    recipient = message.conversation.participant1 if message.sender != message.conversation.participant1 else message.conversation.participant2
+    
+    Notification.objects.create(
+        user=recipient,
+        message=f"Nuovo messaggio da {message.sender.username}",
+        link=f"/chat/conversation/{message.conversation.conversation_id}/",
+        notification_type='chat_message',
+    )

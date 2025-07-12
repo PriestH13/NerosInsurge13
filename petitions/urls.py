@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import (HomeView,PetitionListView,PetitionDetailView,PetitionCreateView,PetitionUpdateView,PetitionDeleteView,RequestSignatureView,ConfirmSignatureView,
-    PetitionSearchView,PetitionVoteView,ReportPetitionView,NotificationListView,AboutView, TermsView, PrivacyView, mark_notification_read
+    PetitionSearchView,PetitionVoteView,ReportPetitionView,NotificationListView,AboutView, TermsView, PrivacyView, mark_notification_read, go_to_notification
 )
 
 app_name = 'petitions'
@@ -26,6 +26,8 @@ urlpatterns = [
     # Notif
     path('notifications/', NotificationListView.as_view(), name='notification_list'),
     path('mark-notification-read/<int:pk>/', mark_notification_read, name='mark_notification_read'),
+    path('notifications/go-to/<int:pk>/', go_to_notification, name='go_to_notification'),
+
     # other
     path('other/chi-siamo/', AboutView.as_view(), name='about'),
     path('other/termini-e-condizioni/', TermsView.as_view(), name='terms'),
